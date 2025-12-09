@@ -112,17 +112,18 @@
 </div>
 
 <!-- Preview box -->
-<!-- Preview box -->
-<h2>Preview</h2>
-<div id="preview-container" style="width:100%; max-width:500px; margin-top:1rem; text-align:center;">
-  <div id="frame-preview" style="background:#8b4513; display:inline-block; position:relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing:border-box;">
-    <div id="mat-preview" style="background:#f5f5dc; position:relative; box-sizing:border-box;">
-      <div id="pic-preview" style="background:#add8e6; box-sizing:border-box;"></div>
-    </div>
-  </div>
-</div>
-
 <script>
+// Converts "600mm", "60cm", "0.6m" -> mm
+function toMM(val){
+    if(!val) return 0;
+    val = val.toString().trim().toLowerCase();
+    if(val.endsWith("mm")) return parseFloat(val);
+    if(val.endsWith("cm")) return parseFloat(val)*10;
+    if(val.endsWith("m"))  return parseFloat(val)*1000;
+    return parseFloat(val);
+}
+
+// scale factor to fit preview nicely
 const scale = 0.5; // 0.5px per mm
 
 function calc(){
@@ -144,25 +145,21 @@ function calc(){
     const matEl   = document.getElementById("mat-preview");
     const picEl   = document.getElementById("pic-preview");
 
-    // Outer frame dimensions
-    frameEl.style.width  = (frameWidth*scale) + "px";
-    frameEl.style.height = (frameHeight*scale) + "px";
-    frameEl.style.paddingTop    = (fmH*scale) + "px";
-    frameEl.style.paddingBottom = (fmH*scale) + "px";
-    frameEl.style.paddingLeft   = (fmW*scale) + "px";
-    frameEl.style.paddingRight  = (fmW*scale) + "px";
+    // Frame
+    frameEl.style.width  = (frameWidth*scale)+"px";
+    frameEl.style.height = (frameHeight*scale)+"px";
 
-    // Mat dimensions
-    matEl.style.width  = (picW + matW*2)*scale + "px";
-    matEl.style.height = (picH + matH*2)*scale + "px";
-    matEl.style.paddingTop    = (matH*scale) + "px";
-    matEl.style.paddingBottom = (matH*scale) + "px";
-    matEl.style.paddingLeft   = (matW*scale) + "px";
-    matEl.style.paddingRight  = (matW*scale) + "px";
+    // Mat inside frame
+    matEl.style.width  = ((picW + matW*2)*scale)+"px";
+    matEl.style.height = ((picH + matH*2)*scale)+"px";
+    matEl.style.top = (fmH*scale - inset*scale)+"px";
+    matEl.style.left = (fmW*scale - inset*scale)+"px";
 
-    // Picture dimensions
-    picEl.style.width  = (picW*scale) + "px";
-    picEl.style.height = (picH*scale) + "px";
+    // Picture inside mat
+    picEl.style.width  = (picW*scale)+"px";
+    picEl.style.height = (picH*scale)+"px";
+    picEl.style.top = (matH*scale)+"px";
+    picEl.style.left = (matW*scale)+"px";
 }
 
 // Elements
@@ -178,7 +175,8 @@ document.querySelectorAll("input").forEach(el=>{
     el.addEventListener("input", calc);
 });
 
-calc();
+// Run once on page load
+window.addEventListener("DOMContentLoaded", calc);
 </script>
 
   
