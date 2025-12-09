@@ -111,19 +111,24 @@
     <div><b>Frame Height:</b> <span id="outH">—</span></div>
 </div>
 
-
+<!-- Preview box -->
+<h2>Preview</h2>
+<div id="preview-container" style="border:1px solid #ccc; width:100%; max-width:500px; padding:10px; margin-top:1rem;">
+  <div id="frame-preview" style="background:#8b4513; position:relative; margin:auto;">
+    <div id="mat-preview" style="background:#f5f5dc; position:absolute; top:0; left:0;">
+      <div id="pic-preview" style="background:#add8e6; position:absolute; top:0; left:0;"></div>
+    </div>
+  </div>
+</div>
+  
 <script>
 // Converts "600mm", "60cm", "0.6m" -> mm
 function toMM(val){
     if(!val) return 0;
-
     val = val.toString().trim().toLowerCase();
-
     if(val.endsWith("mm")) return parseFloat(val);
     if(val.endsWith("cm")) return parseFloat(val)*10;
     if(val.endsWith("m"))  return parseFloat(val)*1000;
-
-    // default assume mm
     return parseFloat(val);
 }
 
@@ -136,16 +141,35 @@ function calc(){
     let fmH  = toMM(fmHEl.value);
     let inset= toMM(insetEl.value || "6");
 
-    // formula:
-    // total = picture + mat*2 + frame*2 - inset*2
-
+    // formula: total = picture + mat*2 + frame*2 - inset*2
     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
+
+    // scale factor for preview
+    const scale = 0.5; // 0.5px per mm
+    const frameEl = document.getElementById("frame-preview");
+    const matEl   = document.getElementById("mat-preview");
+    const picEl   = document.getElementById("pic-preview");
+
+    frameEl.style.width  = (frameWidth*scale)+"px";
+    frameEl.style.height = (frameHeight*scale)+"px";
+    frameEl.style.position = "relative";
+
+    matEl.style.width  = ((picW + matW*2)*scale)+"px";
+    matEl.style.height = ((picH + matH*2)*scale)+"px";
+    matEl.style.top = (fmH*scale - inset*scale)+"px";
+    matEl.style.left = (fmW*scale - inset*scale)+"px";
+
+    picEl.style.width  = (picW*scale)+"px";
+    picEl.style.height = (picH*scale)+"px";
+    picEl.style.top = (matH*scale)+"px";
+    picEl.style.left = (matW*scale)+"px";
 }
 
+// Elements
 let picWEl = document.getElementById("picW");
 let picHEl = document.getElementById("picH");
 let matWEl = document.getElementById("matW");
@@ -158,6 +182,8 @@ document.querySelectorAll("input").forEach(el=>{
     el.addEventListener("input", calc);
 });
 
+// Initial calc
+calc();
 </script>
 
 </body>
