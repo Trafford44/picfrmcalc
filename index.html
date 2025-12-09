@@ -2,6 +2,57 @@
 <html>
 <head>
 <meta charset="UTF-8" />
+
+<style>
+  body {
+    font-family: sans-serif;
+    padding: 1rem;
+    max-width: 700px;
+    margin: auto;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: .9rem;
+  }
+
+  input {
+    margin-top: .3rem;
+    padding: .5rem;
+    font-size: 1rem;
+  }
+
+  /* Results box */
+  #result {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: .5rem;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    font-size: 1.1rem;
+  }
+
+  /* 📱 Mobile tweak */
+  @media (max-width: 600px) {
+    form {
+      grid-template-columns: 1fr; /* stack inputs */
+    }
+  }
+</style>
+    
+    
 <title>Picture Frame Calculator</title>
 
 <style>
