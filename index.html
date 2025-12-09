@@ -116,6 +116,10 @@
 // Converts "600mm", "60cm", "0.6m" -> mm
 function toMM(val){
     if(!val) return 0;
+    if (isNaN(val)) {
+      alert("Inputs must be numeric!");
+      return;
+    }
     val = val.toString().trim().toLowerCase();
     if(val.endsWith("mm")) return parseFloat(val);
     if(val.endsWith("cm")) return parseFloat(val)*10;
