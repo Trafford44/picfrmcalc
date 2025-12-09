@@ -139,60 +139,47 @@ const picEl   = document.getElementById("pic-preview");
 let scale = 0.5;
 
 // Main calculation
-function calc(){
-    let picW = toMM(picWEl.value);
-    let picH = toMM(picHEl.value);
-    let matW = toMM(matWEl.value);
-    let matH = toMM(matHEl.value);
-    let fmW  = toMM(fmWEl.value);
-    let fmH  = toMM(fmHEl.value);
-    let inset= toMM(insetEl.value || "6");
+function calc() {
+    let picW = toMM(picWEl.value) || 0;
+    let picH = toMM(picHEl.value) || 0;
+    let matW = toMM(matWEl.value) || 0;
+    let matH = toMM(matHEl.value) || 0;
+    let fmW  = toMM(fmWEl.value) || 0;
+    let fmH  = toMM(fmHEl.value) || 0;
+    let inset= toMM(insetEl.value) || 6;
 
-    // Skip calculation if all fields are empty
-    if(!picWEl.value && !picHEl.value && !matWEl.value && !matHEl.value && !fmWEl.value && !fmHEl.value){
+    // Only alert if a value is negative
+    if(picW < 0 || picH < 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0 || inset < 0){
+        alert("Dimensions cannot be negative!");
+        return;
+    }
+
+    // Skip calculation if picture dimensions are zero (not filled yet)
+    if(picW === 0 || picH === 0){
         document.getElementById("outW").textContent = "—";
         document.getElementById("outH").textContent = "—";
         frameEl.style.width = frameEl.style.height = "0px";
         matEl.style.width = matEl.style.height = "0px";
         picEl.style.width = picEl.style.height = "0px";
-        return; // stop here
-    }
-
-    // Validation for partially entered values
-    if(picW <= 0 || picH <= 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0){
-        alert("All dimensions must be positive numbers!");
         return;
     }
 
+    // Total frame dimensions
     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
-
-    if(frameWidth <= 0 || frameHeight <= 0){
-        alert("Invalid combination of dimensions!");
-        return;
-    }
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
-    // Responsive preview scaling
-    const containerWidth = document.getElementById("preview-container").clientWidth - 20;
-    scale = Math.min(scale, containerWidth / frameWidth);
-
+    // Update preview
+    const scale = 0.5; // or dynamically scale
     frameEl.style.width  = (frameWidth*scale)+"px";
     frameEl.style.height = (frameHeight*scale)+"px";
-    frameEl.style.position = "relative";
-
     matEl.style.width  = ((picW + matW*2)*scale)+"px";
     matEl.style.height = ((picH + matH*2)*scale)+"px";
-    matEl.style.top = (fmH*scale - inset*scale)+"px";
-    matEl.style.left = (fmW*scale - inset*scale)+"px";
-
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
-    picEl.style.top = (matH*scale)+"px";
-    picEl.style.left = (matW*scale)+"px";
-}
+};
 
 
 // Local storage
