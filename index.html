@@ -113,24 +113,17 @@
 
 <!-- Preview box -->
 <h2>Preview</h2>
-<div id="preview-container" style="border:1px solid #ccc; width:100%; max-width:500px; padding:10px; margin-top:1rem;">
-  <div id="frame-preview" style="background:#8b4513; position:relative; margin:auto;">
-    <div id="mat-preview" style="background:#f5f5dc; position:absolute; top:0; left:0;">
-      <div id="pic-preview" style="background:#add8e6; position:absolute; top:0; left:0;"></div>
+<div id="preview-container" style="width:100%; max-width:500px; margin-top:1rem; text-align:center;">
+  <div id="frame-preview" style="background:#8b4513; display:inline-block; position:relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="mat-preview" style="background:#f5f5dc; position:relative; margin:auto;">
+      <div id="pic-preview" style="background:#add8e6; margin:auto;"></div>
     </div>
   </div>
 </div>
-  
+
 <script>
-// Converts "600mm", "60cm", "0.6m" -> mm
-function toMM(val){
-    if(!val) return 0;
-    val = val.toString().trim().toLowerCase();
-    if(val.endsWith("mm")) return parseFloat(val);
-    if(val.endsWith("cm")) return parseFloat(val)*10;
-    if(val.endsWith("m"))  return parseFloat(val)*1000;
-    return parseFloat(val);
-}
+// scale factor to fit preview nicely
+const scale = 0.5; // 0.5px per mm
 
 function calc(){
     let picW = toMM(picWEl.value);
@@ -141,32 +134,31 @@ function calc(){
     let fmH  = toMM(fmHEl.value);
     let inset= toMM(insetEl.value || "6");
 
-    // formula: total = picture + mat*2 + frame*2 - inset*2
+    // total frame dimensions
     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
-    // scale factor for preview
-    const scale = 0.5; // 0.5px per mm
+    // Preview elements
     const frameEl = document.getElementById("frame-preview");
     const matEl   = document.getElementById("mat-preview");
     const picEl   = document.getElementById("pic-preview");
 
+    // Outer frame
     frameEl.style.width  = (frameWidth*scale)+"px";
     frameEl.style.height = (frameHeight*scale)+"px";
-    frameEl.style.position = "relative";
+    frameEl.style.padding = `${fmH*scale}px ${fmW*scale}px`; // frame thickness
 
-    matEl.style.width  = ((picW + matW*2)*scale)+"px";
-    matEl.style.height = ((picH + matH*2)*scale)+"px";
-    matEl.style.top = (fmH*scale - inset*scale)+"px";
-    matEl.style.left = (fmW*scale - inset*scale)+"px";
+    // Mat
+    matEl.style.width  = (picW + matW*2)*scale + "px";
+    matEl.style.height = (picH + matH*2)*scale + "px";
+    matEl.style.padding = `${matH*scale}px ${matW*scale}px`;
 
-    picEl.style.width  = (picW*scale)+"px";
-    picEl.style.height = (picH*scale)+"px";
-    picEl.style.top = (matH*scale)+"px";
-    picEl.style.left = (matW*scale)+"px";
+    // Picture
+    picEl.style.width  = (picW*scale) + "px";
+    picEl.style.height = (picH*scale) + "px";
 }
 
 // Elements
@@ -182,9 +174,8 @@ document.querySelectorAll("input").forEach(el=>{
     el.addEventListener("input", calc);
 });
 
-// Initial calc
 calc();
 </script>
-
+  
 </body>
 </html>
