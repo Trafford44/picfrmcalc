@@ -15,70 +15,37 @@
     text-align: center;
   }
 
-  form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-
   label {
     display: flex;
     flex-direction: column;
     font-weight: 600;
     font-size: .9rem;
+    margin-top: 1rem;
   }
 
   input {
     margin-top: .3rem;
     padding: .5rem;
     font-size: 1rem;
+    width: 100%;
   }
 
-  /* Results box */
-  #result {
-    margin-top: 2rem;
-    padding: 1rem;
-    border-radius: .5rem;
-    background: #fafafa;
-    border: 1px solid #ddd;
-    font-size: 1.1rem;
+  .result {
+    background:#f5f5f5;
+    padding:12px;
+    margin-top:1rem;
+    border-radius:6px;
+    font-size:1.1rem;
   }
 
-  /* 📱 Mobile tweak */
   @media (max-width: 600px) {
     form {
-      grid-template-columns: 1fr; /* stack inputs */
+      grid-template-columns: 1fr;
     }
   }
 </style>
     
-    
 <title>Picture Frame Calculator</title>
-
-<style>
-    body {
-        font-family: sans-serif;
-        padding: 20px;
-        max-width: 700px;
-        margin: auto;
-    }
-    h1 { margin-bottom: 1rem; }
-    label { display:block; margin-top:1rem; }
-    input {
-        width:100%;
-        padding:8px;
-        font-size:16px;
-        margin-top:4px;
-    }
-    .result {
-        background:#f5f5f5;
-        padding:12px;
-        margin-top:1rem;
-        border-radius:6px;
-        font-size:1.1rem;
-    }
-</style>
-
 </head>
 
 <body>
@@ -132,6 +99,22 @@ function toMM(val){
     return parseFloat(val);
 }
 
+// Elements
+let picWEl = document.getElementById("picW");
+let picHEl = document.getElementById("picH");
+let matWEl = document.getElementById("matW");
+let matHEl = document.getElementById("matH");
+let fmWEl  = document.getElementById("fmW");
+let fmHEl  = document.getElementById("fmH");
+let insetEl= document.getElementById("inset");
+
+const frameEl = document.getElementById("frame-preview");
+const matEl   = document.getElementById("mat-preview");
+const picEl   = document.getElementById("pic-preview");
+
+const scale = 0.5; // 0.5px per mm
+
+// Main calculation
 function calc(){
     let picW = toMM(picWEl.value);
     let picH = toMM(picHEl.value);
@@ -148,12 +131,7 @@ function calc(){
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
-    // scale factor for preview
-    const scale = 0.5; // 0.5px per mm
-    const frameEl = document.getElementById("frame-preview");
-    const matEl   = document.getElementById("mat-preview");
-    const picEl   = document.getElementById("pic-preview");
-
+    // Update preview
     frameEl.style.width  = (frameWidth*scale)+"px";
     frameEl.style.height = (frameHeight*scale)+"px";
     frameEl.style.position = "relative";
@@ -169,24 +147,42 @@ function calc(){
     picEl.style.left = (matW*scale)+"px";
 }
 
-// Elements
-let picWEl = document.getElementById("picW");
-let picHEl = document.getElementById("picH");
-let matWEl = document.getElementById("matW");
-let matHEl = document.getElementById("matH");
-let fmWEl  = document.getElementById("fmW");
-let fmHEl  = document.getElementById("fmH");
-let insetEl= document.getElementById("inset");
+// Save to localStorage
+function saveToLocalStorage() {
+    localStorage.setItem("picW", picWEl.value);
+    localStorage.setItem("picH", picHEl.value);
+    localStorage.setItem("matW", matWEl.value);
+    localStorage.setItem("matH", matHEl.value);
+    localStorage.setItem("fmW", fmWEl.value);
+    localStorage.setItem("fmH", fmHEl.value);
+    localStorage.setItem("inset", insetEl.value);
+}
 
-document.querySelectorAll("input").forEach(el=>{
-    el.addEventListener("input", calc);
+// Load from localStorage
+function loadFromLocalStorage() {
+    if(localStorage.getItem("picW")) picWEl.value = localStorage.getItem("picW");
+    if(localStorage.getItem("picH")) picHEl.value = localStorage.getItem("picH");
+    if(localStorage.getItem("matW")) matWEl.value = localStorage.getItem("matW");
+    if(localStorage.getItem("matH")) matHEl.value = localStorage.getItem("matH");
+    if(localStorage.getItem("fmW"))  fmWEl.value = localStorage.getItem("fmW");
+    if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
+    if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
+}
+
+// Event listeners
+document.querySelectorAll("input").forEach(el => {
+    el.addEventListener("input", () => {
+        saveToLocalStorage();
+        calc();
+    });
 });
 
-// Initial calc
-calc();
+// Load values and calculate on page load
+window.addEventListener("DOMContentLoaded", () => {
+    loadFromLocalStorage();
+    calc();
+});
 </script>
 
-
-  
 </body>
 </html>
