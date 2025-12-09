@@ -72,10 +72,10 @@
 </label>
 
 <label>Picture Width</label>
-<input id="picW" placeholder="e.g. 500mm">
+<input id="picW" placeholder="e.g. 300mm">
 
 <label>Picture Height</label>
-<input id="picH" placeholder="e.g. 400mm">
+<input id="picH" placeholder="e.g. 500mm">
 
 <label>Mat Width</label>
 <input id="matW" placeholder="e.g. 50mm">
@@ -153,7 +153,12 @@ function calc() {
         alert("Dimensions cannot be negative!");
         return;
     }
-
+    if (isNaN(picW) || isNaN(picH) || isNaN(matW) || isNaN(matH) || 
+        isNaN(fmW) || isNaN(fmH) || isNaN(inset)) {
+        alert("Inputs must be numeric!");
+        return;
+    }
+  
     // Skip calculation if picture dimensions are zero (not filled yet)
     if(picW === 0 || picH === 0){
         document.getElementById("outW").textContent = "—";
