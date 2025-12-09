@@ -116,10 +116,6 @@
 // Converts "600mm", "60cm", "0.6m" -> mm
 function toMM(val){
     if(!val) return 0;
-    if (isNaN(val)) {
-      alert("Inputs must be numeric!");
-      return;
-    }
     val = val.toString().trim().toLowerCase();
     if(val.endsWith("mm")) return parseFloat(val);
     if(val.endsWith("cm")) return parseFloat(val)*10;
@@ -157,6 +153,7 @@ function calc() {
         alert("Dimensions cannot be negative!");
         return;
     }
+    // this doesn't factor - should be in toMM.  Could prob delete
     if (isNaN(picW) || isNaN(picH) || isNaN(matW) || isNaN(matH) || 
         isNaN(fmW) || isNaN(fmH) || isNaN(inset)) {
         alert("Inputs must be numeric!");
