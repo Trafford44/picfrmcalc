@@ -55,10 +55,15 @@
   }
 
   .mat-pic-overlap {
-    display: flex;          /* align items in a row */
-    gap: 10px;              /* space between each label+input */
-    align-items: center;    /* vertically center inputs and labels */
-    flex-wrap: wrap;        /* optional: wrap on smaller screens */
+    display: flex;          /* arrange children in a row */
+    gap: 10px;              /* spacing between each pair */
+    align-items: center;    /* vertically center labels and inputs */
+  }
+  
+  .pair {
+    display: flex;          /* label and input side by side */
+    align-items: center;
+    gap: 4px;               /* small space between label and input */
   }
   
   .mat-pic-overlap label {
@@ -96,16 +101,16 @@
 
 <label>Mat/Picture Overlap:</label>
 <div class="mat-pic-overlap">
-  <label>T</label><input id="matPicOT" value="5mm">
-  <label>B</label><input id="matPicOB" value="5mm">
-  <label>L</label><input id="matPicOL" value="5mm">
-  <label>R</label><input id="matPicOR" value="5mm">
+  <div class="pair"><label>T</label><input id="matPicOT" value="5mm"></div>
+  <div class="pair"><label>B</label><input id="matPicOB" value="5mm"></div>
+  <div class="pair"><label>L</label><input id="matPicOL" value="5mm"></div>
+  <div class="pair"><label>R</label><input id="matPicOR" value="5mm"></div>
 </div>
   
-<label>Frame Material Width</label>
+<label>Framing Material Width</label>
 <input id="fmW" placeholder="e.g. 40mm">
 
-<label>Frame Material Height</label>
+<label>Framing Material Height</label>
 <input id="fmH" placeholder="40mm">
 
 <label>Frame Inset (default 6mm)</label>
@@ -169,7 +174,7 @@ function calc() {
 
     // Only alert if a value is negative
     if(picW < 0 || picH < 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0 || inset < 0){
-        alert("Dimensions cannot be negative!");
+        alert("Dimensions cannot be negative!");Framing Material Width
         return;
     }
     // this doesn't factor - should be in toMM.  Could prob delete
@@ -190,8 +195,23 @@ function calc() {
     }
 
     // Total frame dimensions
-    let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
-    let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
+    let pictureWidth = picW;
+    let pictureHeight = picH;
+    let matWidth = matW;
+    let matHeight = matH;
+    let matPicOverlapTop = matPicOT;
+    let matPicOverlapBottom = matPicOB;
+    let matPicOverlapLeft = matPicOL;
+    let matPicOverlapRight = matPicOR;
+    let framingMaterialWidth = fmW;
+    let framingMaterialHeight = fmH;
+    let frameInset = inset;
+
+    let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
+    let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
+  
+    // let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
+    // let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
