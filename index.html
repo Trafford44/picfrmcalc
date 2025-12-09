@@ -160,7 +160,7 @@ const frameEl = document.getElementById("frame-preview");
 const matEl   = document.getElementById("mat-preview");
 const picEl   = document.getElementById("pic-preview");
 
-let scale = 0.5;
+let scale = 0.5; // 0.5px per mm
 
 // Main calculation
 function calc() {
@@ -211,11 +211,11 @@ function calc() {
     let framingMaterialHeight = fmH;
     let frameInset = inset;
 
-    let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
-    let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
+    //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
+    //let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
   
-    // let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
-    // let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
+     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
+     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
