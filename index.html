@@ -168,6 +168,10 @@ function calc() {
     let picH = toMM(picHEl.value) || 0;
     let matW = toMM(matWEl.value) || 0;
     let matH = toMM(matHEl.value) || 0;
+    let matPOT = toMM(matPicOT.value) || 5;
+    let matPOB = toMM(matPicOB.value) || 5;
+    let matPOL = toMM(matPicOL.value) || 5;
+    let matPOR = toMM(matPicOR.value) || 5;
     let fmW  = toMM(fmWEl.value) || 0;
     let fmH  = toMM(fmHEl.value) || 0;
     let inset= toMM(insetEl.value) || 6;
@@ -199,10 +203,10 @@ function calc() {
     let pictureHeight = picH;
     let matWidth = matW;
     let matHeight = matH;
-    let matPicOverlapTop = matPicOT;
-    let matPicOverlapBottom = matPicOB;
-    let matPicOverlapLeft = matPicOL;
-    let matPicOverlapRight = matPicOR;
+    let matPicOverlapTop = matPOT;
+    let matPicOverlapBottom = matPOB;
+    let matPicOverlapLeft = matPOL;
+    let matPicOverlapRight = matPOR;
     let framingMaterialWidth = fmW;
     let framingMaterialHeight = fmH;
     let frameInset = inset;
