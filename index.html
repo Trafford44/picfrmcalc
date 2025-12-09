@@ -148,7 +148,17 @@ function calc(){
     let fmH  = toMM(fmHEl.value);
     let inset= toMM(insetEl.value || "6");
 
-    // Validation
+    // Skip calculation if all fields are empty
+    if(!picWEl.value && !picHEl.value && !matWEl.value && !matHEl.value && !fmWEl.value && !fmHEl.value){
+        document.getElementById("outW").textContent = "—";
+        document.getElementById("outH").textContent = "—";
+        frameEl.style.width = frameEl.style.height = "0px";
+        matEl.style.width = matEl.style.height = "0px";
+        picEl.style.width = picEl.style.height = "0px";
+        return; // stop here
+    }
+
+    // Validation for partially entered values
     if(picW <= 0 || picH <= 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0){
         alert("All dimensions must be positive numbers!");
         return;
@@ -165,11 +175,10 @@ function calc(){
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
-    // Responsive scale to fit preview container
+    // Responsive preview scaling
     const containerWidth = document.getElementById("preview-container").clientWidth - 20;
     scale = Math.min(scale, containerWidth / frameWidth);
 
-    // Update preview
     frameEl.style.width  = (frameWidth*scale)+"px";
     frameEl.style.height = (frameHeight*scale)+"px";
     frameEl.style.position = "relative";
@@ -184,6 +193,7 @@ function calc(){
     picEl.style.top = (matH*scale)+"px";
     picEl.style.left = (matW*scale)+"px";
 }
+
 
 // Local storage
 function saveToLocalStorage() {
