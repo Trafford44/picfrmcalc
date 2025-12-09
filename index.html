@@ -218,22 +218,55 @@ document.querySelectorAll("input").forEach(el => {
 
 // Reset button
 document.getElementById("resetBtn").addEventListener("click", () => {
+    // Clear local storage
     localStorage.clear();
-    picWEl.value = picHEl.value = matWEl.value = matHEl.value = fmWEl.value = fmHEl.value = insetEl.value = '';
+    
+    // Clear inputs
+    picWEl.value = '';
+    picHEl.value = '';
+    matWEl.value = '';
+    matHEl.value = '';
+    fmWEl.value = '';
+    fmHEl.value = '';
+    insetEl.value = '6mm';
     presetEl.value = '';
-    calc();
+    
+    // Reset output display
+    document.getElementById("outW").textContent = "—";
+    document.getElementById("outH").textContent = "—";
+
+    // Reset preview
+    frameEl.style.width = frameEl.style.height = "0px";
+    matEl.style.width = matEl.style.height = "0px";
+    picEl.style.width = picEl.style.height = "0px";
 });
 
 // Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
-    const txt = `Picture: ${picWEl.value} x ${picHEl.value}
-Mat: ${matWEl.value} x ${matHEl.value}
-Frame: ${fmWEl.value} x ${fmHEl.value}
-Inset: ${insetEl.value}
-Total Frame: ${document.getElementById("outW").textContent} x ${document.getElementById("outH").textContent}`;
-    navigator.clipboard.writeText(txt);
-    alert("Results copied to clipboard!");
+    const pw = picWEl.value || "0mm";
+    const ph = picHEl.value || "0mm";
+    const mw = matWEl.value || "0mm";
+    const mh = matHEl.value || "0mm";
+    const fw = fmWEl.value || "0mm";
+    const fh = fmHEl.value || "0mm";
+    const inset = insetEl.value || "6mm"; // default inset if empty
+    const totalW = document.getElementById("outW").textContent || "0 mm";
+    const totalH = document.getElementById("outH").textContent || "0 mm";
+
+    const txt = `Picture: ${pw} x ${ph}
+Mat: ${mw} x ${mh}
+Frame: ${fw} x ${fh}
+Inset: ${inset}
+Total Frame: ${totalW} x ${totalH}`;
+
+    navigator.clipboard.writeText(txt).then(() => {
+        alert("Results copied to clipboard!");
+    }).catch(err => {
+        console.error("Copy failed:", err);
+        alert("Unable to copy results.");
+    });
 });
+
 
 // Preset selection
 presetEl.addEventListener("change", () => {
