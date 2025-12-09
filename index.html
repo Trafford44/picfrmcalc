@@ -23,11 +23,12 @@
     margin-top: 1rem;
   }
 
-  input {
+  input, select, button {
     margin-top: .3rem;
     padding: .5rem;
     font-size: 1rem;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .result {
@@ -43,6 +44,15 @@
       grid-template-columns: 1fr;
     }
   }
+
+  #preview-container {
+    border:1px solid #ccc;
+    width:100%;
+    max-width:500px;
+    padding:10px;
+    margin-top:1rem;
+    text-align:center;
+  }
 </style>
     
 <title>Picture Frame Calculator</title>
@@ -51,6 +61,15 @@
 <body>
 
 <h1>Picture Frame Calculator</h1>
+
+<label>Preset Sizes
+  <select id="preset">
+    <option value="">-- Select a preset --</option>
+    <option value="210x297|20|20|10|10|6">A4</option>
+    <option value="297x420|30|30|15|15|6">A3</option>
+    <option value="420x594|40|40|20|20|6">A2</option>
+  </select>
+</label>
 
 <label>Picture Width</label>
 <input id="picW" placeholder="e.g. 500mm">
@@ -73,6 +92,11 @@
 <label>Frame Inset (default 6mm)</label>
 <input id="inset" value="6mm">
 
+<div style="margin-top:1rem; display:flex; gap:10px;">
+  <button id="resetBtn">Reset</button>
+  <button id="copyBtn">Copy Results</button>
+</div>
+
 <div class="result">
     <div><b>Frame Width:</b> <span id="outW">—</span></div>
     <div><b>Frame Height:</b> <span id="outH">—</span></div>
@@ -80,7 +104,7 @@
 
 <!-- Preview box -->
 <h2>Preview</h2>
-<div id="preview-container" style="border:1px solid #ccc; width:100%; max-width:500px; padding:10px; margin-top:1rem;">
+<div id="preview-container">
   <div id="frame-preview" style="background:#8b4513; position:relative; margin:auto;">
     <div id="mat-preview" style="background:#f5f5dc; position:absolute; top:0; left:0;">
       <div id="pic-preview" style="background:#add8e6; position:absolute; top:0; left:0;"></div>
@@ -107,12 +131,12 @@ let matHEl = document.getElementById("matH");
 let fmWEl  = document.getElementById("fmW");
 let fmHEl  = document.getElementById("fmH");
 let insetEl= document.getElementById("inset");
-
+let presetEl = document.getElementById("preset");
 const frameEl = document.getElementById("frame-preview");
 const matEl   = document.getElementById("mat-preview");
 const picEl   = document.getElementById("pic-preview");
 
-const scale = 0.5; // 0.5px per mm
+let scale = 0.5;
 
 // Main calculation
 function calc(){
@@ -124,12 +148,26 @@ function calc(){
     let fmH  = toMM(fmHEl.value);
     let inset= toMM(insetEl.value || "6");
 
-    // formula: total = picture + mat*2 + frame*2 - inset*2
+    // Validation
+    if(picW <= 0 || picH <= 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0){
+        alert("All dimensions must be positive numbers!");
+        return;
+    }
+
     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
+    if(frameWidth <= 0 || frameHeight <= 0){
+        alert("Invalid combination of dimensions!");
+        return;
+    }
+
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
+
+    // Responsive scale to fit preview container
+    const containerWidth = document.getElementById("preview-container").clientWidth - 20;
+    scale = Math.min(scale, containerWidth / frameWidth);
 
     // Update preview
     frameEl.style.width  = (frameWidth*scale)+"px";
@@ -147,7 +185,7 @@ function calc(){
     picEl.style.left = (matW*scale)+"px";
 }
 
-// Save to localStorage
+// Local storage
 function saveToLocalStorage() {
     localStorage.setItem("picW", picWEl.value);
     localStorage.setItem("picH", picHEl.value);
@@ -156,9 +194,9 @@ function saveToLocalStorage() {
     localStorage.setItem("fmW", fmWEl.value);
     localStorage.setItem("fmH", fmHEl.value);
     localStorage.setItem("inset", insetEl.value);
+    localStorage.setItem("preset", presetEl.value);
 }
 
-// Load from localStorage
 function loadFromLocalStorage() {
     if(localStorage.getItem("picW")) picWEl.value = localStorage.getItem("picW");
     if(localStorage.getItem("picH")) picHEl.value = localStorage.getItem("picH");
@@ -167,6 +205,7 @@ function loadFromLocalStorage() {
     if(localStorage.getItem("fmW"))  fmWEl.value = localStorage.getItem("fmW");
     if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
     if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
+    if(localStorage.getItem("preset")) presetEl.value = localStorage.getItem("preset");
 }
 
 // Event listeners
@@ -175,6 +214,41 @@ document.querySelectorAll("input").forEach(el => {
         saveToLocalStorage();
         calc();
     });
+});
+
+// Reset button
+document.getElementById("resetBtn").addEventListener("click", () => {
+    localStorage.clear();
+    picWEl.value = picHEl.value = matWEl.value = matHEl.value = fmWEl.value = fmHEl.value = insetEl.value = '';
+    presetEl.value = '';
+    calc();
+});
+
+// Copy results
+document.getElementById("copyBtn").addEventListener("click", () => {
+    const txt = `Picture: ${picWEl.value} x ${picHEl.value}
+Mat: ${matWEl.value} x ${matHEl.value}
+Frame: ${fmWEl.value} x ${fmHEl.value}
+Inset: ${insetEl.value}
+Total Frame: ${document.getElementById("outW").textContent} x ${document.getElementById("outH").textContent}`;
+    navigator.clipboard.writeText(txt);
+    alert("Results copied to clipboard!");
+});
+
+// Preset selection
+presetEl.addEventListener("change", () => {
+    if(!presetEl.value) return;
+    const [pic, mat, frame, inset] = presetEl.value.split("|");
+    const [pw, ph] = pic.split("x");
+    picWEl.value = pw + "mm";
+    picHEl.value = ph + "mm";
+    matWEl.value = mat + "mm";
+    matHEl.value = mat + "mm";
+    fmWEl.value = frame + "mm";
+    fmHEl.value = frame + "mm";
+    insetEl.value = inset + "mm";
+    saveToLocalStorage();
+    calc();
 });
 
 // Load values and calculate on page load
