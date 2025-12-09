@@ -140,22 +140,22 @@ let scale = 0.5;
 
 // Main calculation
 function calc() {
-    let picW = toMM(picWEl.value) || 0;
-    let picH = toMM(picHEl.value) || 0;
-    let matW = toMM(matWEl.value) || 0;
-    let matH = toMM(matHEl.value) || 0;
-    let fmW  = toMM(fmWEl.value) || 0;
-    let fmH  = toMM(fmHEl.value) || 0;
-    let inset= toMM(insetEl.value) || 6;
+    let picW = picWEl.value ? toMM(picWEl.value) : 0;
+    let picH = picHEl.value ? toMM(picHEl.value) : 0;
+    let matW = matWEl.value ? toMM(matWEl.value) : 0;
+    let matH = matHEl.value ? toMM(matHEl.value) : 0;
+    let fmW  = fmWEl.value ? toMM(fmWEl.value) : 0;
+    let fmH  = fmHEl.value ? toMM(fmHEl.value) : 0;
+    let inset= insetEl.value ? toMM(insetEl.value) : 6;
 
-    // Only alert if a value is negative
+    // Check for negative values only
     if(picW < 0 || picH < 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0 || inset < 0){
         alert("Dimensions cannot be negative!");
         return;
     }
 
-    // Skip calculation if picture dimensions are zero (not filled yet)
-    if(picW === 0 || picH === 0){
+    // Skip calculation if picture dimensions are missing
+    if(picW === 0 || picH === 0) {
         document.getElementById("outW").textContent = "—";
         document.getElementById("outH").textContent = "—";
         frameEl.style.width = frameEl.style.height = "0px";
@@ -171,15 +171,30 @@ function calc() {
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
+    // Responsive scale
+    const container = document.getElementById("preview-container");
+    const padding = 20; // some padding
+    const maxW = container.clientWidth - padding;
+    const maxH = container.clientHeight - padding;
+
+    const scaleX = maxW / frameWidth;
+    const scaleY = maxH / frameHeight;
+    const scale = Math.min(scaleX, scaleY, 0.5); // limit maximum scale
+
     // Update preview
-    const scale = 0.5; // or dynamically scale
     frameEl.style.width  = (frameWidth*scale)+"px";
     frameEl.style.height = (frameHeight*scale)+"px";
+
     matEl.style.width  = ((picW + matW*2)*scale)+"px";
     matEl.style.height = ((picH + matH*2)*scale)+"px";
+    matEl.style.top = (fmH*scale - inset*scale)+"px";
+    matEl.style.left = (fmW*scale - inset*scale)+"px";
+
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
-};
+    picEl.style.top = (matH*scale)+"px";
+    picEl.style.left = (matW*scale)+"px";
+}
 
 
 // Local storage
