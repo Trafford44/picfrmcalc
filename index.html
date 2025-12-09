@@ -112,17 +112,17 @@
 </div>
 
 <!-- Preview box -->
+<!-- Preview box -->
 <h2>Preview</h2>
 <div id="preview-container" style="width:100%; max-width:500px; margin-top:1rem; text-align:center;">
-  <div id="frame-preview" style="background:#8b4513; display:inline-block; position:relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <div id="mat-preview" style="background:#f5f5dc; position:relative; margin:auto;">
-      <div id="pic-preview" style="background:#add8e6; margin:auto;"></div>
+  <div id="frame-preview" style="background:#8b4513; display:inline-block; position:relative; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing:border-box;">
+    <div id="mat-preview" style="background:#f5f5dc; position:relative; box-sizing:border-box;">
+      <div id="pic-preview" style="background:#add8e6; box-sizing:border-box;"></div>
     </div>
   </div>
 </div>
 
 <script>
-// scale factor to fit preview nicely
 const scale = 0.5; // 0.5px per mm
 
 function calc(){
@@ -134,29 +134,33 @@ function calc(){
     let fmH  = toMM(fmHEl.value);
     let inset= toMM(insetEl.value || "6");
 
-    // total frame dimensions
     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
-    // Preview elements
     const frameEl = document.getElementById("frame-preview");
     const matEl   = document.getElementById("mat-preview");
     const picEl   = document.getElementById("pic-preview");
 
-    // Outer frame
-    frameEl.style.width  = (frameWidth*scale)+"px";
-    frameEl.style.height = (frameHeight*scale)+"px";
-    frameEl.style.padding = `${fmH*scale}px ${fmW*scale}px`; // frame thickness
+    // Outer frame dimensions
+    frameEl.style.width  = (frameWidth*scale) + "px";
+    frameEl.style.height = (frameHeight*scale) + "px";
+    frameEl.style.paddingTop    = (fmH*scale) + "px";
+    frameEl.style.paddingBottom = (fmH*scale) + "px";
+    frameEl.style.paddingLeft   = (fmW*scale) + "px";
+    frameEl.style.paddingRight  = (fmW*scale) + "px";
 
-    // Mat
+    // Mat dimensions
     matEl.style.width  = (picW + matW*2)*scale + "px";
     matEl.style.height = (picH + matH*2)*scale + "px";
-    matEl.style.padding = `${matH*scale}px ${matW*scale}px`;
+    matEl.style.paddingTop    = (matH*scale) + "px";
+    matEl.style.paddingBottom = (matH*scale) + "px";
+    matEl.style.paddingLeft   = (matW*scale) + "px";
+    matEl.style.paddingRight  = (matW*scale) + "px";
 
-    // Picture
+    // Picture dimensions
     picEl.style.width  = (picW*scale) + "px";
     picEl.style.height = (picH*scale) + "px";
 }
@@ -176,6 +180,7 @@ document.querySelectorAll("input").forEach(el=>{
 
 calc();
 </script>
+
   
 </body>
 </html>
