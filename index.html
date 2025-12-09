@@ -1,90 +1,112 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Frame Calculator</title>
-  <style>
+<meta charset="UTF-8" />
+<title>Picture Frame Calculator</title>
+
+<style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 700px;
+        margin: auto;
     }
-    label {
-      display: block;
-      margin: 10px 0 4px;
-    }
+    h1 { margin-bottom: 1rem; }
+    label { display:block; margin-top:1rem; }
     input {
-      padding: 6px 10px;
-      width: 200px;
+        width:100%;
+        padding:8px;
+        font-size:16px;
+        margin-top:4px;
     }
     .result {
-      margin-top: 30px;
-      padding: 15px;
-      border: 1px solid #ccc;
-      background:#f7f7f7;
-      width: 260px;
+        background:#f5f5f5;
+        padding:12px;
+        margin-top:1rem;
+        border-radius:6px;
+        font-size:1.1rem;
     }
-  </style>
+</style>
+
 </head>
+
 <body>
 
-<h2>Frame Calculator</h2>
+<h1>Picture Frame Calculator</h1>
 
-<label>Picture Height (mm)</label>
-<input id="picH" type="number">
+<label>Picture Width</label>
+<input id="picW" placeholder="e.g. 500mm">
 
-<label>Picture Width (mm)</label>
-<input id="picW" type="number">
+<label>Picture Height</label>
+<input id="picH" placeholder="e.g. 400mm">
 
-<label>Matt Height (mm)</label>
-<input id="matH" type="number">
+<label>Mat Width</label>
+<input id="matW" placeholder="e.g. 50mm">
 
-<label>Matt Width (mm)</label>
-<input id="matW" type="number">
+<label>Mat Height</label>
+<input id="matH" placeholder="e.g. 50mm">
 
-<label>Frame Material Height (mm)</label>
-<input id="fmH" type="number">
+<label>Frame Material Width</label>
+<input id="fmW" placeholder="e.g. 40mm">
 
-<label>Frame Material Width (mm)</label>
-<input id="fmW" type="number">
+<label>Frame Material Height</label>
+<input id="fmH" placeholder="e.g. 40mm">
 
-<label>Frame Material Depth (mm)</label>
-<input id="fmD" type="number">
-
-<label>Frame Inset (mm)</label>
-<input id="inset" type="number" value="6">
+<label>Frame Inset (default 6mm)</label>
+<input id="inset" value="6mm">
 
 <div class="result">
-  <strong>Frame Height:</strong> <span id="frameHeight">–</span><br>
-  <strong>Frame Width:</strong> <span id="frameWidth">–</span>
+    <div><b>Frame Width:</b> <span id="outW">—</span></div>
+    <div><b>Frame Height:</b> <span id="outH">—</span></div>
 </div>
 
+
 <script>
-function calculate() {
-  const picH = +document.getElementById("picH").value;
-  const picW = +document.getElementById("picW").value;
-  const matH = +document.getElementById("matH").value;
-  const matW = +document.getElementById("matW").value;
-  const fmH  = +document.getElementById("fmH").value;
-  const fmW  = +document.getElementById("fmW").value;
-  const inset = +document.getElementById("inset").value;
+// Converts "600mm", "60cm", "0.6m" -> mm
+function toMM(val){
+    if(!val) return 0;
 
-  // quick safety
-  if(!picH || !picW) return;
+    val = val.toString().trim().toLowerCase();
 
-  const frameHeight = picH + matH*2 + fmH*2 - inset*2;
-  const frameWidth  = picW + matW*2 + fmW*2 - inset*2;
+    if(val.endsWith("mm")) return parseFloat(val);
+    if(val.endsWith("cm")) return parseFloat(val)*10;
+    if(val.endsWith("m"))  return parseFloat(val)*1000;
 
-  document.getElementById("frameHeight").textContent = 
-      frameHeight.toFixed(1) + " mm";
-
-  document.getElementById("frameWidth").textContent =
-      frameWidth.toFixed(1) + " mm";
+    // default assume mm
+    return parseFloat(val);
 }
 
-// update on input
-document.querySelectorAll("input").forEach(el => {
-  el.addEventListener("input", calculate);
+function calc(){
+    let picW = toMM(picWEl.value);
+    let picH = toMM(picHEl.value);
+    let matW = toMM(matWEl.value);
+    let matH = toMM(matHEl.value);
+    let fmW  = toMM(fmWEl.value);
+    let fmH  = toMM(fmHEl.value);
+    let inset= toMM(insetEl.value || "6");
+
+    // formula:
+    // total = picture + mat*2 + frame*2 - inset*2
+
+    let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
+    let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
+
+    document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
+    document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
+}
+
+let picWEl = document.getElementById("picW");
+let picHEl = document.getElementById("picH");
+let matWEl = document.getElementById("matW");
+let matHEl = document.getElementById("matH");
+let fmWEl  = document.getElementById("fmW");
+let fmHEl  = document.getElementById("fmH");
+let insetEl= document.getElementById("inset");
+
+document.querySelectorAll("input").forEach(el=>{
+    el.addEventListener("input", calc);
 });
+
 </script>
 
 </body>
