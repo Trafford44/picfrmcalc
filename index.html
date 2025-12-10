@@ -211,13 +211,13 @@ function calc() {
     let framingMaterialHeight = fmH;
     let frameInset = inset;
 
-    // make some adjustments
+    // make some adjustments - not working - comment out for now
     // reduce the size of the picture by the mat overlap amount
-    picW = picW - matPOL - matPOR
-    picH = picH - matPOT - matPOT
+//    picW = picW - matPOL - matPOR
+//    picH = picH - matPOT - matPOT
     // reduce the size=  of the mat by the amount set inside the inset
-    matW = matW - inset*2
-    matH = matH - inset*2
+//    matW = matW - inset*2
+//    matH = matH - inset*2
     // frame width remains the same
   
     //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
