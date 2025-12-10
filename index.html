@@ -217,6 +217,9 @@ function calc() {
      let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
      let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
+    console.log("frameWidth: ", frameWidth);
+    console.log("frameHeight: ", frameHeight);
+  
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
 
