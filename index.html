@@ -242,8 +242,10 @@ function calc() {
 
     matEl.style.width  = ((picW + matW*2)*scale)+"px";
     matEl.style.height = ((picH + matH*2)*scale)+"px";
-    matEl.style.top = (fmH*scale - inset*scale)+"px";
-    matEl.style.left = (fmW*scale - inset*scale)+"px";
+    //matEl.style.top = (fmH*scale - inset*scale)+"px";
+    //matEl.style.left = (fmW*scale - inset*scale)+"px";
+    matEl.style.top = (fmH*scale*scale)+"px";
+    matEl.style.left = (fmW*scale*scale)+"px";
 
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
