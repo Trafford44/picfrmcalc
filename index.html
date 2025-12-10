@@ -211,14 +211,18 @@ function calc() {
     let framingMaterialHeight = fmH;
     let frameInset = inset;
 
+    // make some adjustments
+    picW = picW - matPOL - matPOR
+    picH = picH - matPOT - matPOT
+  
     //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
     //let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
   
      let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
      let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
-    console.log("frameWidth: ", frameWidth);
-    console.log("frameHeight: ", frameHeight);
+    //console.log("frameWidth: ", frameWidth);
+    //console.log("frameHeight: ", frameHeight);
   
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
