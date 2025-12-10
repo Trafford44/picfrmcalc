@@ -213,21 +213,21 @@ function calc() {
 
     // make some adjustments - not working - comment out for now
     // reduce the size of the picture by the mat overlap amount
-//    picW = picW - matPOL - matPOR
-//    picH = picH - matPOT - matPOT
+    picW = picW - matPOL - matPOR
+    picH = picH - matPOT - matPOT
     // reduce the size=  of the mat by the amount set inside the inset
-//    matW = matW - inset*2
-//    matH = matH - inset*2
+    matW = matW - inset*2
+    matH = matH - inset*2
     // frame width remains the same
   
     //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
     //let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
   
-     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
-     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
+     //let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
+     //let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
-     //let frameWidth  = picW + (matW*2) + (fmW*2);
-     //let frameHeight = picH + (matH*2) + (fmH*2);
+     let frameWidth  = picW + (matW*2) + (fmW*2);
+     let frameHeight = picH + (matH*2) + (fmH*2);
   
     //console.log("frameWidth: ", frameWidth);
     //console.log("frameHeight: ", frameHeight);
@@ -249,6 +249,18 @@ function calc() {
     picEl.style.height = (picH*scale)+"px";
     picEl.style.top = (matH*scale)+"px";
     picEl.style.left = (matW*scale)+"px";
+
+
+  console.log("Preview frame width: ", (frameWidth*scale)+"px");
+  console.log("Preview frame height: ", (frameHeight*scale)+"px");
+  console.log("Preview mat width: ", ((picW + matW*2)*scale)+"px");
+  console.log("Preview mat height: ", ((picH + matH*2)*scale)+"px");
+  console.log("Preview mat top: ", (fmH*scale - inset*scale)+"px");
+  console.log("Preview mat left: ", (fmW*scale - inset*scale)+"px");
+  console.log("Preview picture width: ", (picW*scale)+"px");
+  console.log("Preview picture height: ", (picH*scale)+"px");
+  console.log("Preview picture top: ", (matH*scale)+"px");
+  console.log("Preview picture left: ", (matW*scale)+"px");
   
 };
 
