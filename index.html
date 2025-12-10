@@ -71,12 +71,12 @@
   }  
 </style>
     
-<title>Picture Frame Calculator</title>
+<title>Picture Frame Size Calculator</title>
 </head>
 
 <body>
 
-<h1>Picture Frame Calculator</h1>
+<h1>Picture Frame Size Calculator</h1>
 
 <label>Preset Sizes
   <select id="preset">
@@ -212,15 +212,23 @@ function calc() {
     let frameInset = inset;
 
     // make some adjustments
+    // reduce the size of the picture by the mat overlap amount
     picW = picW - matPOL - matPOR
     picH = picH - matPOT - matPOT
+    // reduce the size=  of the mat by the amount set inside the inset
+    matW = matW - inset*2
+    matH = matH - inset*2
+    // frame width remains the same
   
     //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
     //let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
   
-     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
-     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
+     //let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
+     // let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
 
+     let frameWidth  = picW + (matW*2) + (fmW*2);
+     let frameHeight = picH + (matH*2) + (fmH*2);
+  
     //console.log("frameWidth: ", frameWidth);
     //console.log("frameHeight: ", frameHeight);
   
@@ -317,7 +325,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 Mat: ${mw} x ${mh}
 Frame: ${fw} x ${fh}
 Inset: ${inset}
-Total Frame: ${totalW} x ${totalH}`;
+Total Frame: W ${totalW} x H ${totalH}`;
 
     navigator.clipboard.writeText(txt).then(() => {
         alert("Results copied to clipboard!");
