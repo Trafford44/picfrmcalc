@@ -177,7 +177,9 @@ let presetEl = document.getElementById("preset");
 const frameEl = document.getElementById("frame-preview");
 const matEl   = document.getElementById("mat-preview");
 const picEl   = document.getElementById("pic-preview");
-
+let overlapMode = document.getElementById("overlapMode");
+let overlapInput = document.getElementById("PicMatOverlap");
+  
 let scale = 0.5; // 0.5px per mm
 
 // Main calculation
@@ -261,9 +263,6 @@ function calc() {
   */
   
 };
-
-const overlapMode = document.getElementById("overlapMode");
-const overlapInput = document.getElementById("PicMatOverlap");
 
 overlapMode.addEventListener("change", () => {
   if (overlapMode.value === "no") {
