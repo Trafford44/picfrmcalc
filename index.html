@@ -55,6 +55,18 @@
     text-align:center;
   }
 
+  #pic-preview {
+    background:#add8e6; 
+    position:absolute; 
+    top:0; left:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family: monospace;
+    font-size: 14px;
+    color: #000;
+  }
+  
   .mat-pic-overlap {
     display: flex;          /* arrange children in a row */
     gap: 10px;              /* spacing between each pair */
@@ -146,7 +158,13 @@
 <div id="preview-container">
   <div id="frame-preview" style="background:#8b4513; position:relative; margin:auto;">
     <div id="mat-preview" style="background:#f5f5dc; position:absolute; top:0; left:0;">
-      <div id="pic-preview" style="background:#add8e6; position:absolute; top:0; left:0;"></div>
+      <div id="pic-preview">
+          /\
+         /  \
+        /____\
+        |    |
+        |_[]_|
+      </div>
     </div>
   </div>
 </div>
