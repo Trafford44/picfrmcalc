@@ -221,6 +221,9 @@ function calc() {
     // calc it!
     // get the total width/height, then subtract the overlaps
 
+    frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
+    frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
+  
     /*
     let frameWidth = 0;
     let frameHeight = 0;
@@ -232,7 +235,7 @@ function calc() {
       frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2))
       frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2))
     }
-    */
+    
   
     const safe = v => Number.isFinite(v) ? v : 0;    
     let frameWidth =
@@ -243,7 +246,7 @@ function calc() {
       frameWidth -= safe(matPOL) + safe(matPOR);
       frameHeight -= safe(matPOT) + safe(matPOB);
     }
-
+    */
   
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
