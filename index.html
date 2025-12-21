@@ -279,7 +279,7 @@ function calc() {
     //picEl.style.width  = (picW*scale)+"px";
     //picEl.style.height = (picH*scale)+"px";
 
-
+/*
     if (overlapMode.value === "yes") {
       picEl.style.top = ((matH-matPOT)*scale)+"px";
       picEl.style.left = ((matW-matPOL)*scale)+"px";
@@ -288,6 +288,20 @@ function calc() {
       picEl.style.top = (matH*scale)+"px";
       picEl.style.left = (matW*scale)+"px";      
     }
+*/
+  
+    let picTop  = matH;
+    let picLeft = matW;
+    
+    if (overlapMode.value === "yes") {
+      picTop  -= matPOT;
+      picLeft -= matPOL;
+    }
+    
+    picEl.style.top  = (picTop  * scale) + "px";
+    picEl.style.left = (picLeft * scale) + "px";
+
+
   
   /*
   console.log("Preview frame width: ", (frameWidth*scale)+"px");
