@@ -272,12 +272,16 @@ function calc() {
     matEl.style.width  = (matWidth  * scale) + "px";
     matEl.style.height = (matHeight * scale) + "px";
 
-
+    let matTop  = fmH - inset;
+    let matLeft = fmW - inset;    
+    if (overlapMode.value === "yes") {
+      matTop  -= matPOT;
+      matLeft -= matPOL;
+    }    
+    matEl.style.top  = (matTop  * scale) + "px";
+    matEl.style.left = (matLeft * scale) + "px";
 
   
-    matEl.style.top = ((fmH - inset)*scale)+"px";
-    matEl.style.left = ((fmW - inset)*scale)+"px";
-
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
     picEl.style.top = (matH*scale)+"px";
