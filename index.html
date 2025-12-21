@@ -69,6 +69,12 @@
   .mat-pic-overlap label {
     margin-right: 4px;      /* small space between label and input */
   }  
+
+  input:disabled {
+  background-color: #eee;
+  color: #777;
+}
+
 </style>
     
 <title>Picture Frame Size Calculator</title>
@@ -86,6 +92,14 @@
     <option value="420x594|40|40|20|20|6">A2</option>
   </select>
 </label>
+
+<label for="overlapMode">Picture / Mat Overlap</label>
+<select id="overlapMode">
+  <option value="yes" selected>Yes</option>
+  <option value="no">No</option>
+</select>
+<label for="PicMatOverlap">Overlap amount</label>
+<input id="PicMatOverlap" type="number" value="5" min="0">
 
 <label>Picture Width</label>
 <input id="picW" placeholder="e.g. 300mm">
@@ -241,6 +255,20 @@ function calc() {
   */
   
 };
+
+const overlapMode = document.getElementById("overlapMode");
+const overlapInput = document.getElementById("PicMatOverlap");
+
+overlapMode.addEventListener("change", () => {
+  if (overlapMode.value === "no") {
+    overlapInput.value = 0;
+    overlapInput.disabled = true;
+  } else {
+    overlapInput.disabled = false;
+  }
+
+  updateCalculator(); // keep your live recalculation
+});
 
 
 // Local storage
