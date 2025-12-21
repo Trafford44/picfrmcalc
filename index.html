@@ -220,14 +220,30 @@ function calc() {
 
     // calc it!
     // get the total width/height, then subtract the overlaps
+
+    /*
+    let frameWidth = 0;
+    let frameHeight = 0;
     if (overlapMode.value === "yes") {
-      let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
-      let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
+      frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
+      frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
     }
     else {
-      let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2))
-      let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2))
+      frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2))
+      frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2))
     }
+    */
+  
+    const safe = v => Number.isFinite(v) ? v : 0;    
+    let frameWidth =
+      safe(picW) + safe(matW) * 2 + safe(fmW) * 2 - safe(inset) * 2;    
+    let frameHeight =
+      safe(picH) + safe(matH) * 2 + safe(fmH) * 2 - safe(inset) * 2;    
+    if (overlapMode.value === "yes") {
+      frameWidth -= safe(matPOL) + safe(matPOR);
+      frameHeight -= safe(matPOT) + safe(matPOB);
+    }
+
   
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
