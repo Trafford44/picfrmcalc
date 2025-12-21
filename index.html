@@ -152,6 +152,10 @@ let picWEl = document.getElementById("picW");
 let picHEl = document.getElementById("picH");
 let matWEl = document.getElementById("matW");
 let matHEl = document.getElementById("matH");
+let matPOTEL = document.getElementById("matPicOT");
+let matPOBEL = document.getElementById("matPicOB");
+let matPOLEL = document.getElementById("matPicOL");
+let matPOREL = document.getElementById("matPicOR");  
 let fmWEl  = document.getElementById("fmW");
 let fmHEl  = document.getElementById("fmH");
 let insetEl= document.getElementById("inset");
@@ -198,44 +202,10 @@ function calc() {
         return;
     }
 
-    // Total frame dimensions
-    let pictureWidth = picW;
-    let pictureHeight = picH;
-    let matWidth = matW;
-    let matHeight = matH;
-    let matPicOverlapTop = matPOT;
-    let matPicOverlapBottom = matPOB;
-    let matPicOverlapLeft = matPOL;
-    let matPicOverlapRight = matPOR;
-    let framingMaterialWidth = fmW;
-    let framingMaterialHeight = fmH;
-    let frameInset = inset;
-
-    // make some adjustments - not working - comment out for now
-    // reduce the size of the picture by the mat overlap amount
-//    picW = picW - matPOL - matPOR
-//    picH = picH - matPOT - matPOT
-    // reduce the size=  of the mat by the amount set inside the inset
-//    matW = matW - inset*2
-//    matH = matH - inset*2
-    // frame width remains the same
-  
-    //let frameWidth = pictureWidth + (matWidth*2) - matPicOverlapLeft - matPicOverlapRight - (frameInset*2) + framingMaterialWidth
-    //let frameHeight = pictureHeight + (matHeight*2) - matPicOverlapTop - matPicOverlapBottom - (frameInset*2) + framingMaterialHeight
-
     // calc it!
     // get the total width/height, then subtract the overlaps
     let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
     let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
-  
-//     let frameWidth  = picW + (matW*2) + (fmW*2) - (inset*2);
-//     let frameHeight = picH + (matH*2) + (fmH*2) - (inset*2);
-
- //    let frameWidth  = picW + (matW*2) + (fmW*2);
- //    let frameHeight = picH + (matH*2) + (fmH*2);
-  
-    //console.log("frameWidth: ", frameWidth);
-    //console.log("frameHeight: ", frameHeight);
   
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
@@ -280,6 +250,10 @@ function saveToLocalStorage() {
     localStorage.setItem("fmH", fmHEl.value);
     localStorage.setItem("inset", insetEl.value);
     localStorage.setItem("preset", presetEl.value);
+    localStorage.setItem("matPicOT", matPOTEL.value);
+    localStorage.setItem("matPicOB", matPOBEL.value);
+    localStorage.setItem("matPicOL", matPOLEL.value);
+    localStorage.setItem("matPicOR", matPOREL.value);
 }
 
 function loadFromLocalStorage() {
@@ -291,6 +265,10 @@ function loadFromLocalStorage() {
     if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
     if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
     if(localStorage.getItem("preset")) presetEl.value = localStorage.getItem("preset");
+    if(localStorage.getItem("matPicOT")) matPOTEL.value = localStorage.getItem("matPicOT");
+    if(localStorage.getItem("matPicOB")) matPOBEL.value = localStorage.getItem("matPicOB");
+    if(localStorage.getItem("matPicOL")) matPOLEL.value = localStorage.getItem("matPicOL");
+    if(localStorage.getItem("matPicOR")) matPOREL.value = localStorage.getItem("matPicOR");
 }
 
 // Event listeners
