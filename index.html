@@ -98,8 +98,6 @@
   <option value="yes" selected>Yes</option>
   <option value="no">No</option>
 </select>
-<label for="PicMatOverlap">Overlap amount</label>
-<input id="PicMatOverlap" type="number" value="5" min="0">
 
 <label>Picture Width</label>
 <input id="picW" placeholder="e.g. 300mm">
@@ -178,7 +176,6 @@ const frameEl = document.getElementById("frame-preview");
 const matEl   = document.getElementById("mat-preview");
 const picEl   = document.getElementById("pic-preview");
 let overlapMode = document.getElementById("overlapMode");
-let overlapInput = document.getElementById("PicMatOverlap");
   
 let scale = 0.5; // 0.5px per mm
 
@@ -279,25 +276,13 @@ function calc() {
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
 
-/*
-    if (overlapMode.value === "yes") {
-      picEl.style.top = ((matH-matPOT)*scale)+"px";
-      picEl.style.left = ((matW-matPOL)*scale)+"px";
-    }
-    else {
-      picEl.style.top = (matH*scale)+"px";
-      picEl.style.left = (matW*scale)+"px";      
-    }
-*/
   
     let picTop  = matH;
-    let picLeft = matW;
-    
+    let picLeft = matW;    
     if (overlapMode.value === "yes") {
       picTop  -= matPOT;
       picLeft -= matPOL;
-    }
-    
+    }    
     picEl.style.top  = (picTop  * scale) + "px";
     picEl.style.left = (picLeft * scale) + "px";
 
@@ -412,14 +397,11 @@ Total Frame: W ${totalW} x H ${totalH}`;
 
 overlapMode.addEventListener("change", () => {
   if (overlapMode.value === "no") {
-    overlapInput.value = 0;
-    overlapInput.disabled = true;
     matPOTEl.disabled = true;
     matPOBEl.disabled = true;
     matPOLEl.disabled = true;
     matPOREl.disabled = true;    
   } else {
-    overlapInput.disabled = false;
     matPOTEl.disabled = false;
     matPOBEl.disabled = false;
     matPOLEl.disabled = false;
