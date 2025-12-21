@@ -218,8 +218,14 @@ function calc() {
 
     // calc it!
     // get the total width/height, then subtract the overlaps
-    let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
-    let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
+    if (overlapMode.value === "yes") {
+      let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2) + matPOL + matPOR)
+      let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2) + matPOT + matPOB)
+    }
+    else {
+      let frameWidth = (picW + (matW*2) + (fmW*2)) - ((inset*2))
+      let frameHeight = (picH + (matH*2) + (fmH*2)) - ((inset*2))
+    }
   
     document.getElementById("outW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outH").textContent = Math.round(frameHeight)+" mm";
@@ -263,11 +269,19 @@ overlapMode.addEventListener("change", () => {
   if (overlapMode.value === "no") {
     overlapInput.value = 0;
     overlapInput.disabled = true;
+    matPOTEl.disabled = true;
+    matPOBEl.disabled = true;
+    matPOLEl.disabled = true;
+    matPOREl.disabled = true;    
   } else {
     overlapInput.disabled = false;
+    matPOTEl.disabled = false;
+    matPOBEl.disabled = false;
+    matPOLEl.disabled = false;
+    matPOREl.disabled = false;        
   }
 
-  updateCalculator(); // keep your live recalculation
+  calc(); // keep your live recalculation
 });
 
 
