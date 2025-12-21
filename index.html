@@ -236,7 +236,7 @@ function calc() {
     document.getElementById("outFrmW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outFrmH").textContent = Math.round(frameHeight)+" mm";
     document.getElementById("outInsW").textContent = Math.round(frameWidth-matPOL-matPOR)+" mm";
-    document.getElementById("outinsH").textContent = Math.round(frameHeight-matPOT-matPOB)+" mm";
+    document.getElementById("outInsH").textContent = Math.round(frameHeight-matPOT-matPOB)+" mm";
   
     // Update preview
     frameEl.style.width  = (frameWidth*scale)+"px";
@@ -360,14 +360,17 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const fw = fmWEl.value || "0mm";
     const fh = fmHEl.value || "0mm";
     const inset = insetEl.value || "6mm"; // default inset if empty
-    const totalW = document.getElementById("outFrmW").textContent || "0 mm";
-    const totalH = document.getElementById("outFrmH").textContent || "0 mm";
-
+    const totalFrmW = document.getElementById("outFrmW").textContent || "0 mm";
+    const totalFrmH = document.getElementById("outFrmH").textContent || "0 mm";
+    const totalInsW = document.getElementById("outInsW").textContent || "0 mm";
+    const totalInsH = document.getElementById("outInsH").textContent || "0 mm";
+  
     const txt = `Picture: ${pw} x ${ph}
 Mat: ${mw} x ${mh}
 Frame: ${fw} x ${fh}
 Inset: ${inset}
-Total Frame: W ${totalW} x H ${totalH}`;
+Total Frame: W ${totalFrmW} x H ${totalFrmH}
+Total Inset: W ${totalInsW} x H ${totalInsH}`;
 
     navigator.clipboard.writeText(txt).then(() => {
         alert("Results copied to clipboard!");
