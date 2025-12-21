@@ -215,17 +215,19 @@ function calc() {
     frameEl.style.height = (frameHeight*scale)+"px";
     frameEl.style.position = "relative";
 
-    matEl.style.width  = ((picW + (matW*2)-matPOL-matPOR)*scale)+"px";
-    matEl.style.height = ((picH + (matH*2)-matPOT-matPOB)*scale)+"px";
-    matEl.style.top = (fmH*scale - inset*scale)+"px";
-    matEl.style.left = (fmW*scale - inset*scale)+"px";
+    //matEl.style.width  = (((picW + (matW*2))-matPOL-matPOR)*scale)+"px";
+    //matEl.style.height = (((picH + (matH*2))-matPOT-matPOB)*scale)+"px";
+    matEl.style.width  = ((picW + (matW-*2)*scale)+"px";
+    matEl.style.height = ((picH + matH*2)*scale)+"px";  
+    matEl.style.top = ((fmH - inset)*scale)+"px";
+    matEl.style.left = ((fmW - inset)*scale)+"px";
 
     picEl.style.width  = (picW*scale)+"px";
     picEl.style.height = (picH*scale)+"px";
     picEl.style.top = (matH*scale)+"px";
     picEl.style.left = (matW*scale)+"px";
 
-
+  /*
   console.log("Preview frame width: ", (frameWidth*scale)+"px");
   console.log("Preview frame height: ", (frameHeight*scale)+"px");
   console.log("Preview mat width: ", ((picW + matW*2)*scale)+"px");
@@ -236,6 +238,7 @@ function calc() {
   console.log("Preview picture height: ", (picH*scale)+"px");
   console.log("Preview picture top: ", (matH*scale)+"px");
   console.log("Preview picture left: ", (matW*scale)+"px");
+  */
   
 };
 
