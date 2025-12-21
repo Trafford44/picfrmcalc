@@ -272,21 +272,22 @@ function calc() {
     matEl.style.width  = (matWidth  * scale) + "px";
     matEl.style.height = (matHeight * scale) + "px";
 
-    let matTop  = fmH - inset;
-    let matLeft = fmW - inset;    
-    if (overlapMode.value === "yes") {
-      matTop  -= matPOT;
-      matLeft -= matPOL;
-    }    
-    matEl.style.top  = (matTop  * scale) + "px";
-    matEl.style.left = (matLeft * scale) + "px";
-
+    matEl.style.top = ((fmH - inset)*scale)+"px"; 
+    matEl.style.left = ((fmW - inset)*scale)+"px";
   
-    picEl.style.width  = (picW*scale)+"px";
-    picEl.style.height = (picH*scale)+"px";
-    picEl.style.top = (matH*scale)+"px";
-    picEl.style.left = (matW*scale)+"px";
+ 
+    //picEl.style.width  = (picW*scale)+"px";
+    //picEl.style.height = (picH*scale)+"px";
 
+
+    if (overlapMode.value === "yes") {
+      picEl.style.top = ((matH-matPOT)*scale)+"px";
+      picEl.style.left = ((matW-matPOL)*scale)+"px";
+    else {
+      picEl.style.top = (matH*scale)+"px";
+      picEl.style.left = (matW*scale)+"px";      
+    }
+  
   /*
   console.log("Preview frame width: ", (frameWidth*scale)+"px");
   console.log("Preview frame height: ", (frameHeight*scale)+"px");
