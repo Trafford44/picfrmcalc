@@ -215,8 +215,8 @@ function calc() {
     frameEl.style.height = (frameHeight*scale)+"px";
     frameEl.style.position = "relative";
 
-    matEl.style.width  = ((picW + matW*2)*scale)+"px";
-    matEl.style.height = ((picH + matH*2)*scale)+"px";
+    matEl.style.width  = (picW + (matW*2)-matPOL-matPOR)*scale)+"px";
+    matEl.style.height = (picH + (matH*2)-matPOT-matPOB)*scale)+"px";
     matEl.style.top = (fmH*scale - inset*scale)+"px";
     matEl.style.left = (fmW*scale - inset*scale)+"px";
 
