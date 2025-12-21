@@ -152,10 +152,10 @@ let picWEl = document.getElementById("picW");
 let picHEl = document.getElementById("picH");
 let matWEl = document.getElementById("matW");
 let matHEl = document.getElementById("matH");
-let matPOTEL = document.getElementById("matPicOT");
-let matPOBEL = document.getElementById("matPicOB");
-let matPOLEL = document.getElementById("matPicOL");
-let matPOREL = document.getElementById("matPicOR");  
+let matPOTEl = document.getElementById("matPicOT");
+let matPOBEl = document.getElementById("matPicOB");
+let matPOLEl = document.getElementById("matPicOL");
+let matPOREl = document.getElementById("matPicOR");  
 let fmWEl  = document.getElementById("fmW");
 let fmHEl  = document.getElementById("fmH");
 let insetEl= document.getElementById("inset");
@@ -172,10 +172,10 @@ function calc() {
     let picH = toMM(picHEl.value) || 0;
     let matW = toMM(matWEl.value) || 0;
     let matH = toMM(matHEl.value) || 0;
-    let matPOT = toMM(matPicOT.value) || 5;
-    let matPOB = toMM(matPicOB.value) || 5;
-    let matPOL = toMM(matPicOL.value) || 5;
-    let matPOR = toMM(matPicOR.value) || 5;
+    let matPOT = toMM(matPOTEl.value) || 5;
+    let matPOB = toMM(matPOBEl.value) || 5;
+    let matPOL = toMM(matPOLEl.value) || 5;
+    let matPOR = toMM(matPOREl.value) || 5;
     let fmW  = toMM(fmWEl.value) || 0;
     let fmH  = toMM(fmHEl.value) || 0;
     let inset= toMM(insetEl.value) || 6;
@@ -250,10 +250,10 @@ function saveToLocalStorage() {
     localStorage.setItem("fmH", fmHEl.value);
     localStorage.setItem("inset", insetEl.value);
     localStorage.setItem("preset", presetEl.value);
-    localStorage.setItem("matPicOT", matPOTEL.value);
-    localStorage.setItem("matPicOB", matPOBEL.value);
-    localStorage.setItem("matPicOL", matPOLEL.value);
-    localStorage.setItem("matPicOR", matPOREL.value);
+    localStorage.setItem("matPicOT", matPOTEl.value);
+    localStorage.setItem("matPicOB", matPOBEl.value);
+    localStorage.setItem("matPicOL", matPOLEl.value);
+    localStorage.setItem("matPicOR", matPOREl.value);
 }
 
 function loadFromLocalStorage() {
@@ -265,10 +265,10 @@ function loadFromLocalStorage() {
     if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
     if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
     if(localStorage.getItem("preset")) presetEl.value = localStorage.getItem("preset");
-    if(localStorage.getItem("matPicOT")) matPOTEL.value = localStorage.getItem("matPicOT");
-    if(localStorage.getItem("matPicOB")) matPOBEL.value = localStorage.getItem("matPicOB");
-    if(localStorage.getItem("matPicOL")) matPOLEL.value = localStorage.getItem("matPicOL");
-    if(localStorage.getItem("matPicOR")) matPOREL.value = localStorage.getItem("matPicOR");
+    if(localStorage.getItem("matPicOT")) matPOTEl.value = localStorage.getItem("matPicOT");
+    if(localStorage.getItem("matPicOB")) matPOBEl.value = localStorage.getItem("matPicOB");
+    if(localStorage.getItem("matPicOL")) matPOLEl.value = localStorage.getItem("matPicOL");
+    if(localStorage.getItem("matPicOR")) matPOREl.value = localStorage.getItem("matPicOR");
 }
 
 // Event listeners
