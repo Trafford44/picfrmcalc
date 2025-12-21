@@ -235,8 +235,8 @@ function calc() {
   
     document.getElementById("outFrmW").textContent = Math.round(frameWidth)+" mm";
     document.getElementById("outFrmH").textContent = Math.round(frameHeight)+" mm";
-    document.getElementById("outInsW").textContent = Math.round(picW+matW)+" mm";
-    document.getElementById("outInsH").textContent = Math.round(picH+matH)+" mm";
+    document.getElementById("outInsW").textContent = Math.round(picW+(matW*2))+" mm";
+    document.getElementById("outInsH").textContent = Math.round(picH+(matH*2))+" mm";
   
     // Update preview
     frameEl.style.width  = (frameWidth*scale)+"px";
