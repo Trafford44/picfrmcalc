@@ -89,6 +89,10 @@
   color: #777;
 }
 
+#presetLable #presetSelect{
+  color: "grey";
+}
+  
 </style>
     
 <title>Picture Frame Size Calculator</title>
@@ -98,9 +102,9 @@
 
 <h1>Picture Frame Size Calculator</h1>
 
-<label>Preset Sizes
-  <select id="preset">
-    <option value="">-- Select a preset --</option>
+<label id="presetLable">Preset Sizes
+  <select id="presetSelect">
+    <option value="">-- Select a presetSelect --</option>
     <option value="210x297|20|20|10|10|6">A4</option>
     <option value="297x420|30|30|15|15|6">A3</option>
     <option value="420x594|40|40|20|20|6">A2</option>
@@ -193,7 +197,7 @@ let matPOREl = document.getElementById("matPicOR");
 let fmWEl  = document.getElementById("fmW");
 let fmHEl  = document.getElementById("fmH");
 let insetEl= document.getElementById("inset");
-let presetEl = document.getElementById("preset");
+let presetSelectEl = document.getElementById("presetSelect");
 const frameEl = document.getElementById("frame-preview");
 const matEl   = document.getElementById("mat-preview");
 const picEl   = document.getElementById("pic-preview");
@@ -315,7 +319,7 @@ function saveToLocalStorage() {
     localStorage.setItem("fmW", fmWEl.value);
     localStorage.setItem("fmH", fmHEl.value);
     localStorage.setItem("inset", insetEl.value);
-    localStorage.setItem("preset", presetEl.value);
+    localStorage.setItem("presetSelect", presetSelectEl.value);
     localStorage.setItem("matPicOT", matPOTEl.value);
     localStorage.setItem("matPicOB", matPOBEl.value);
     localStorage.setItem("matPicOL", matPOLEl.value);
@@ -330,7 +334,7 @@ function loadFromLocalStorage() {
     if(localStorage.getItem("fmW"))  fmWEl.value = localStorage.getItem("fmW");
     if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
     if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
-    if(localStorage.getItem("preset")) presetEl.value = localStorage.getItem("preset");
+    if(localStorage.getItem("presetSelect")) presetSelectEl.value = localStorage.getItem("presetSelect");
     if(localStorage.getItem("matPicOT")) matPOTEl.value = localStorage.getItem("matPicOT");
     if(localStorage.getItem("matPicOB")) matPOBEl.value = localStorage.getItem("matPicOB");
     if(localStorage.getItem("matPicOL")) matPOLEl.value = localStorage.getItem("matPicOL");
@@ -358,7 +362,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     fmWEl.value = '';
     fmHEl.value = '';
     insetEl.value = '6mm';
-    presetEl.value = '';
+    presetSelectEl.value = '';
     
     // Reset output display
     document.getElementById("outFrmW").textContent = "—";
@@ -417,10 +421,10 @@ overlapMode.addEventListener("change", () => {
 });
   
 
-// Preset selection
-presetEl.addEventListener("change", () => {
-    if(!presetEl.value) return;
-    const [pic, mat, frame, inset] = presetEl.value.split("|");
+// presetSelect selection
+presetSelectEl.addEventListener("change", () => {
+    if(!presetSelectEl.value) return;
+    const [pic, mat, frame, inset] = presetSelectEl.value.split("|");
     const [pw, ph] = pic.split("x");
     picWEl.value = pw + "mm";
     picHEl.value = ph + "mm";
