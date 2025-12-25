@@ -27,7 +27,7 @@
         .triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
         .overlap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; transition: opacity 0.3s ease; }
         
-        label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px; color: #444; }
+        label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px; color: #444; position: relative; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; }
         
         input:disabled { background-color: #f2f2f2; color: #aaa; cursor: not-allowed; }
@@ -37,6 +37,45 @@
         button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         #resetBtn { background: #ecf0f1; color: #7f8c8d; }
         #copyBtn { background: var(--primary); color: white; }
+
+        /* INFO ICONS & TOOLTIPS */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            background: #bdc3c7;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            margin-left: 5px;
+            cursor: help;
+            vertical-align: middle;
+        }
+        .info-icon:hover { background: var(--primary); }
+        
+        [data-tooltip] { position: relative; }
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: normal;
+            line-height: 1.4;
+            width: 200px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        [data-tooltip]:hover:before { display: block; }
 
         .results-section { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
         .res-card { padding: 12px; border-radius: 8px; border-left: 5px solid var(--primary); background: #f8fbfe; }
@@ -59,24 +98,8 @@
 
         /* REVISED CROSS SECTION */
         .cs-container { position: relative; width: 180px; height: 180px; margin-top: 40px; display: flex; align-items: flex-end; justify-content: flex-start; }
-        
-        .cs-timber { 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            background: var(--timber); 
-            z-index: 5;
-            /* The clip-path creates the Rabbet notch */
-            clip-path: polygon(0% 0%, 100% 0%, 100% 30%, 60% 30%, 60% 100%, 0% 100%);
-        }
-        
-        .cs-stack { 
-            position: absolute; 
-            z-index: 10; 
-            display: flex; 
-            flex-direction: column-reverse;
-        }
-
+        .cs-timber { position: absolute; bottom: 0; left: 0; background: var(--timber); z-index: 5; }
+        .cs-stack { position: absolute; z-index: 10; display: flex; flex-direction: column-reverse; }
         .cs-layer { width: 100%; border: 1px solid rgba(0,0,0,0.1); box-sizing: border-box; }
         .cs-axis { position: absolute; font-size: 9px; font-weight: bold; color: #666; }
         #fit-status { font-size: 11px; font-weight: bold; margin-bottom: 10px; }
@@ -89,7 +112,7 @@
 
     <div class="grid">
         <div>
-            <label>Presets</label>
+            <label>Presets <span class="info-icon" data-tooltip="Standard international paper sizes to speed up entry.">i</span></label>
             <select id="presetSelect">
                 <option value="">-- Choose a Size --</option>
                 <option value="210x297|20|20|10|10|6">A4 (210x297)</option>
@@ -98,7 +121,7 @@
             </select>
         </div>
         <div>
-            <label>Overlap Mode</label>
+            <label>Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board covers the edge of the artwork so it doesn't fall through.">i</span></label>
             <select id="overlapMode">
                 <option value="yes">Active Overlap</option>
                 <option value="no">Flush (No Overlap)</option>
@@ -112,11 +135,11 @@
         <div><label>Art Height (mm)</label><input id="picH" value="297"></div>
     </div>
     <div class="grid">
-        <div><label>Mat Border Width (mm)</label><input id="matW" value="50"></div>
+        <div><label>Mat Border Width (mm) <span class="info-icon" data-tooltip="Width of the mat board margin. Standard is 50mm for medium frames.">i</span></label><input id="matW" value="50"></div>
         <div><label>Mat Border Height (mm)</label><input id="matH" value="50"></div>
     </div>
 
-    <label id="overlapLabel">Mat Overlap per side (mm)</label>
+    <label id="overlapLabel">Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm. This is how much the mat board 'bites' into the artwork area.">i</span></label>
     <div class="overlap-grid" id="overlapFields">
         <div><label style="font-size:10px">Top</label><input id="matPicOT" value="5"></div>
         <div><label style="font-size:10px">Bottom</label><input id="matPicOB" value="5"></div>
@@ -126,27 +149,27 @@
 
     <h3>2. Timber & Stack Thickness</h3>
     <div class="triple-grid">
-        <div><label>Face Width</label><input id="fmW" value="30"></div>
-        <div><label>Timber Depth</label><input id="fmH" value="20"></div>
-        <div><label>Rebate Depth</label><input id="inset" value="10"></div>
+        <div><label>Face Width <span class="info-icon" data-tooltip="The visible width of the timber when looking at the frame from the front.">i</span></label><input id="fmW" value="30"></div>
+        <div><label>Timber Depth <span class="info-icon" data-tooltip="The total thickness of the timber from front to back.">i</span></label><input id="fmH" value="20"></div>
+        <div><label>Rebate Depth <span class="info-icon" data-tooltip="The depth of the 'notch' where glass and art sit. Must be deeper than your stack total.">i</span></label><input id="inset" value="10"></div>
     </div>
     <div class="triple-grid">
-        <div><label>Glass (mm)</label><input id="tGlass" value="3"></div>
-        <div><label>Mat (mm)</label><input id="tMat" value="1.5"></div>
-        <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
+        <div><label>Glass (mm) <span class="info-icon" data-tooltip="Standard picture glass is 2mm-3mm. Acrylic is often 3mm.">i</span></label><input id="tGlass" value="3"></div>
+        <div><label>Mat (mm) <span class="info-icon" data-tooltip="Standard 4-ply mat board is approx 1.4mm - 1.6mm.">i</span></label><input id="tMat" value="1.5"></div>
+        <div><label>Backing (mm) <span class="info-icon" data-tooltip="Standard foam-core or MDF backing is 3mm - 5mm.">i</span></label><input id="tBack" value="3"></div>
     </div>
     <div class="grid">
-        <div><label>Clearance (mm)</label><input id="tolerance" value="2"></div>
+        <div><label>Clearance (mm) <span class="info-icon" data-tooltip="Industry standard is 2mm. This expansion gap prevents the glass from cracking as wood moves.">i</span></label><input id="tolerance" value="2"></div>
     </div>
 
     <h3>3. Material Stock & Ordering</h3>
     <div class="grid">
         <div>
-            <label>Stock Stick Length (mm)</label>
+            <label>Stock Stick Length (mm) <span class="info-icon" data-tooltip="The length of the raw timber moulding sticks you purchase (e.g., 2400mm or 3000mm).">i</span></label>
             <input id="stickLen" value="2400">
         </div>
         <div>
-            <label>Waste Margin (%)</label>
+            <label>Waste Margin (%) <span class="info-icon" data-tooltip="Standard is 10-15%. Accounts for saw blade width (kerf) and wood knots/flaws.">i</span></label>
             <input id="wastePercent" value="10">
         </div>
     </div>
@@ -162,8 +185,6 @@
             <div id="stickCount" style="font-size: 0.7rem; color: #666; margin-top:2px;"></div>
         </div>
     </div>
-
-
 
     <div class="btn-group">
         <button id="resetBtn">Reset</button>
@@ -201,13 +222,11 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 <script>
 const scale = 0.5;
-const csScale = 4; // Scale for profile view
+const csScale = 4;
 
 function toMM(val) {
     if (!val) return 0;
@@ -225,9 +244,31 @@ function updateOverlapUI() {
     overlapInputs.forEach(id => { document.getElementById(id).disabled = isNoOverlap; });
 }
 
+
+function saveToLocal() {
+    const data = {};
+    inputIds.forEach(id => {
+        data[id] = document.getElementById(id).value;
+    });
+    data.overlapMode = document.getElementById("overlapMode").value;
+    localStorage.setItem("frameCalcData", JSON.stringify(data));
+}
+
+function loadFromLocal() {
+    const saved = localStorage.getItem("frameCalcData");
+    if (saved) {
+        const data = JSON.parse(saved);
+        // Fill all inputs
+        inputIds.forEach(id => {
+            if (data[id] !== undefined) document.getElementById(id).value = data[id];
+        });
+        // Fill the dropdown
+        if (data.overlapMode) document.getElementById("overlapMode").value = data.overlapMode;
+    }
+}
+
 function calc() {
     const v = {};
-    // Preserving your input collection logic
     inputIds.forEach(id => {
         const el = document.getElementById(id);
         v[id] = el ? parseFloat(el.value) || 0 : 0;
@@ -236,7 +277,6 @@ function calc() {
     const mode = document.getElementById("overlapMode").value;
     if (v.picW <= 0 || v.picH <= 0) return;
 
-    // 1. Math (Your Original Logic)
     let winW = mode === "no" ? v.picW : v.picW - (v.matPicOL + v.matPicOR);
     let winH = mode === "no" ? v.picH : v.picH - (v.matPicOT + v.matPicOB);
     let glassW = v.picW + (v.matW * 2) - (mode === "yes" ? (v.matPicOL + v.matPicOR) : 0) + v.tolerance;
@@ -249,7 +289,6 @@ function calc() {
     document.getElementById("outFrmW").innerText = Math.round(cutW) + " mm";
     document.getElementById("outFrmH").innerText = Math.round(cutH) + " mm";
 
-    // --- NEW: Timber Ordering Logic (Inserted here to avoid breaking UI updates) ---
     const netLinear = (cutW * 2) + (cutH * 2);
     const wasteMultiplier = 1 + (v.wastePercent / 100);
     const grossLinear = Math.round(netLinear * wasteMultiplier); 
@@ -258,7 +297,6 @@ function calc() {
     document.getElementById("totalTimber").innerText = (grossLinear / 1000).toFixed(2) + " m";
     document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm sticks`;
 
-    // 2. Front Preview (Your Original Logic)
     const fv = document.getElementById("frame-preview");
     const mv = document.getElementById("mat-preview");
     const pv = document.getElementById("pic-preview");
@@ -275,27 +313,22 @@ function calc() {
     pv.style.top = (pTop * scale) + "px";
     pv.style.left = (pLeft * scale) + "px";
 
-    // 3. Side Profile Update (Your Original Proportional Logic)
     const stackTotal = v.tGlass + v.tMat + v.tBack;
     const remain = v.inset - stackTotal;
     const timber = document.getElementById("cs-timber");
     const stack = document.getElementById("cs-stack");
     
-    // Set timber dimensions
     const tw = v.fmW * csScale;
     const th = v.fmH * csScale;
     const rd = v.inset * csScale; 
-    const rw = (v.fmW * 0.4) * csScale; 
 
     timber.style.width = tw + "px";
     timber.style.height = th + "px";
 
-    // Clip path logic (Your notch logic)
     const rebatePctY = (rd / th) * 100;
     const rebatePctX = 60; 
     timber.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${rebatePctY}%, ${rebatePctX}% ${rebatePctY}%, ${rebatePctX}% 100%, 0% 100%)`;
 
-    // Position Stack inside the notch
     stack.style.width = (tw * 0.4) + "px"; 
     stack.style.left = (tw * 0.6) + "px";
     stack.style.bottom = (th - rd) + "px";
@@ -308,10 +341,12 @@ function calc() {
     status.innerText = remain >= 0 ? `FIT: OK (${remain.toFixed(1)}mm left)` : `TOO THICK (${Math.abs(remain).toFixed(1)}mm overlap)`;
     status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
 }
+
 document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", () => {
         if (el.id === "overlapMode") updateOverlapUI();
         calc();
+        saveToLocal(); // Save every change
     });
 });
 
@@ -319,15 +354,18 @@ document.getElementById("presetSelect").addEventListener("change", (e) => {
     if (!e.target.value) return;
     const [dim, mW, mH, fW, fH, ins] = e.target.value.split("|");
     const [w, h] = dim.split("x");
-    document.getElementById("picW").value = w; document.getElementById("picH").value = h;
-    document.getElementById("matW").value = mW; document.getElementById("matH").value = mH;
-    document.getElementById("fmW").value = fW; document.getElementById("fmH").value = fH;
+    document.getElementById("picW").value = w; 
+    document.getElementById("picH").value = h;
+    document.getElementById("matW").value = mW; 
+    document.getElementById("matH").value = mH;
+    document.getElementById("fmW").value = fW; 
+    document.getElementById("fmH").value = fH;
     document.getElementById("inset").value = ins;
     calc();
+    saveToLocal(); // Save after preset application
 });
 
 document.getElementById("copyBtn").addEventListener("click", () => {
-    // Get values directly from the UI results
     const results = {
         win: document.getElementById("windowResult").innerText,
         glass: document.getElementById("glassResult").innerText,
@@ -336,26 +374,20 @@ document.getElementById("copyBtn").addEventListener("click", () => {
         total: document.getElementById("totalTimber").innerText,
         sticks: document.getElementById("stickCount").innerText
     };
-
-    const text = `
-FRAME ORDER SUMMARY:
---------------------
-Timber Cuts: 2 @ ${results.frameW}, 2 @ ${results.frameH}
-Glass/Backing: ${results.glass}
-Mat Window: ${results.win}
-
-ORDERING:
-Total Timber: ${results.total}
-Required: ${results.sticks}
-    `.trim();
-
+    const text = `FRAME ORDER SUMMARY:\n--------------------\nTimber Cuts: 2 @ ${results.frameW}, 2 @ ${results.frameH}\nGlass/Backing: ${results.glass}\nMat Window: ${results.win}\n\nORDERING:\nTotal Timber: ${results.total}\nRequired: ${results.sticks}`.trim();
     navigator.clipboard.writeText(text).then(() => alert("Shopping list copied!"));
 });
 
-document.getElementById("resetBtn").addEventListener("click", () => { location.reload(); });
+document.getElementById("resetBtn").addEventListener("click", () => { 
+    localStorage.removeItem("frameCalcData"); // Clear data on reset
+    location.reload(); 
+});
 
-window.onload = calc;
+window.onload = () => {
+    loadFromLocal();   // Load data first
+    updateOverlapUI(); // Set UI state
+    calc();            // Run calculation
+};
 </script>
-
 </body>
 </html>
