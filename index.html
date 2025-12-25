@@ -1,451 +1,360 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Picture Frame Calculator</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --timber: #5d4037;
+            --timber-accent: #e67e22;
+            --mat: #9b59b6;
+            --glass: rgba(173, 216, 230, 0.7);
+            --backing: #d2b48c;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --disabled: #bdc3c7;
+        }
 
-<style>
-  body {
-    font-family: sans-serif;
-    padding: 1rem;
-    max-width: 700px;
-    margin: auto;
-  }
+        body { font-family: -apple-system, sans-serif; line-height: 1.5; max-width: 900px; margin: 20px auto; padding: 15px; background-color: var(--bg); color: #333; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e1e4e8; }
+        
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 1.8rem; }
+        h3 { font-size: 0.75em; text-transform: uppercase; color: #95a5a6; margin: 20px 0 10px 0; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
 
-  h1 {
-    text-align: center;
-  }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
+        .triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .overlap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; transition: opacity 0.3s ease; }
+        
+        label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px; color: #444; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; }
+        
+        input:disabled { background-color: #f2f2f2; color: #aaa; cursor: not-allowed; }
+        .disabled-label { color: var(--disabled) !important; }
 
-  label {
-    display: flex;
-    flex-direction: column;
-    font-weight: 600;
-    font-size: .9rem;
-    margin-top: 1rem;
-  }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #resetBtn { background: #ecf0f1; color: #7f8c8d; }
+        #copyBtn { background: var(--primary); color: white; }
 
-  input, select, button {
-    margin-top: .3rem;
-    padding: .5rem;
-    font-size: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-  }
+        .results-section { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .res-card { padding: 12px; border-radius: 8px; border-left: 5px solid var(--primary); background: #f8fbfe; }
+        .res-card.timber { border-left-color: var(--timber-accent); background: #fffaf5; }
+        .val { font-weight: bold; font-size: 1.1em; display: block; color: #222; margin-top: 5px; }
 
-  .result {
-    background:#f5f5f5;
-    padding:12px;
-    margin-top:1rem;
-    border-radius:6px;
-    font-size:1.1rem;
-  }
+        .preview-layout { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
+        @media (min-width: 700px) { .preview-layout { grid-template-columns: 1.2fr 0.8fr; } }
 
-  @media (max-width: 600px) {
-    form {
-      grid-template-columns: 1fr;
-    }
-  }
+        .preview-box { background: #e0e0e0; padding: 20px; border-radius: 8px; border: 1px inset #ccc; display: flex; flex-direction: column; align-items: center; min-height: 400px; position: relative; overflow: hidden; }
+        .preview-label { font-size: 10px; font-weight: bold; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; }
 
-  #preview-container {
-    border:1px solid #ccc;
-    width:100%;
-    max-width:500px;
-    padding:10px;
-    margin-top:1rem;
-    margin: 1rem auto;
-    white-space: pre; 
-    text-align:center;
-  }
+        #frame-preview { transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #2c1a0b; }
+        #mat-preview { border: 1px solid #ddd; position: absolute; }
+        #pic-preview { background-image: linear-gradient(45deg, #add8e6 25%, #bfe2ed 25%, #bfe2ed 50%, #add8e6 50%, #add8e6 75%, #bfe2ed 75%, #bfe2ed 100%); background-size: 20px 20px; border: 1px solid #999; }
 
-  #pic-preview {
-    background:#add8e6; 
-    position:absolute; 
-    top:0; left:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-family: monospace;
-    font-size: 28px;
-    color: #000;
-  }
-  
-  .mat-pic-overlap {
-    display: flex;          /* arrange children in a row */
-    gap: 10px;              /* spacing between each pair */
-    align-items: center;    /* vertically center labels and inputs */
-  }
-  
-  .pair {
-    display: flex;          /* label and input side by side */
-    align-items: center;
-    gap: 4px;               /* small space between label and input */
-  }
-  
-  .mat-pic-overlap label {
-    margin-right: 4px;      /* small space between label and input */
-  }  
+        .legend { width: 100%; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 6px; font-size: 10px; margin-bottom: 15px; border: 1px solid #ccc; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .legend-item { display: flex; align-items: center; }
+        .swatch { width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; border: 1px solid #888; }
 
-  input:disabled {
-  background-color: #eee;
-  color: #777;
-}
+        /* REVISED CROSS SECTION */
+        .cs-container { position: relative; width: 180px; height: 180px; margin-top: 40px; display: flex; align-items: flex-end; justify-content: flex-start; }
+        
+        .cs-timber { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            background: var(--timber); 
+            z-index: 5;
+            /* The clip-path creates the Rabbet notch */
+            clip-path: polygon(0% 0%, 100% 0%, 100% 30%, 60% 30%, 60% 100%, 0% 100%);
+        }
+        
+        .cs-stack { 
+            position: absolute; 
+            z-index: 10; 
+            display: flex; 
+            flex-direction: column-reverse;
+        }
 
-#presetLable, #presetSelect{
-  color: #808080;
-}
-
-#presetSelect {
-  border: #808080;
-}
-  
-</style>
-    
-<title>Picture Frame Size Calculator</title>
+        .cs-layer { width: 100%; border: 1px solid rgba(0,0,0,0.1); box-sizing: border-box; }
+        .cs-axis { position: absolute; font-size: 9px; font-weight: bold; color: #666; }
+        #fit-status { font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+    </style>
 </head>
-
 <body>
 
-<h1>Picture Frame Size Calculator</h1>
+<div class="card">
+    <h1>Frame Master Pro</h1>
 
-<label id="presetLable">Preset Sizes
-  <select id="presetSelect">
-    <option value="">-- Select a presetSelect --</option>
-    <option value="210x297|20|20|10|10|6">A4</option>
-    <option value="297x420|30|30|15|15|6">A3</option>
-    <option value="420x594|40|40|20|20|6">A2</option>
-  </select>
-</label>
-
-<label for="overlapMode">Picture / Mat Overlap</label>
-<select id="overlapMode">
-  <option value="yes" selected>Yes</option>
-  <option value="no">No</option>
-</select>
-
-<label>Picture Width</label>
-<input id="picW" placeholder="e.g. 300mm">
-
-<label>Picture Height</label>
-<input id="picH" placeholder="e.g. 500mm">
-
-<label>Mat Width</label>
-<input id="matW" placeholder="e.g. 50mm">
-
-<label>Mat Height</label>
-<input id="matH" placeholder="50mm">
-
-<label>Mat/Picture Overlap:</label>
-<div class="mat-pic-overlap">
-  <div class="pair"><label>T</label><input id="matPicOT" value="5mm"></div>
-  <div class="pair"><label>B</label><input id="matPicOB" value="5mm"></div>
-  <div class="pair"><label>L</label><input id="matPicOL" value="5mm"></div>
-  <div class="pair"><label>R</label><input id="matPicOR" value="5mm"></div>
-</div>
-  
-<label>Framing Material Width</label>
-<input id="fmW" placeholder="e.g. 40mm">
-
-<label>Framing Material Height</label>
-<input id="fmH" placeholder="40mm">
-
-<label>Frame Inset (default 6mm)</label>
-<input id="inset" value="6mm">
-
-<div style="margin-top:1rem; display:flex; gap:10px;">
-  <button id="resetBtn">Reset</button>
-  <button id="copyBtn">Copy Results</button>
-</div>
-
-<div class="result">
-    <div><b>Frame Width:</b> <span id="outFrmW">—</span></div>
-    <div><b>Frame Height:</b> <span id="outFrmH">—</span></div>
-    <div><b>Inset Width:</b> <span id="outInsW">—</span></div>
-    <div><b>Inset Height:</b> <span id="outInsH">—</span></div>  
-</div>
-
-<!-- Preview box -->
-<h2>Preview</h2>
-<div id="preview-container">
-  <div id="frame-preview" style="background:#8b4513; position:relative; margin:auto;">
-    <div id="mat-preview" style="background:#f5f5dc; position:absolute; top:0; left:0;">
-      <div id="pic-preview">
-/\
-/  \
-/____\
-|    |
-|_[]_|
-      </div>
+    <div class="grid">
+        <div>
+            <label>Presets</label>
+            <select id="presetSelect">
+                <option value="">-- Choose a Size --</option>
+                <option value="210x297|20|20|10|10|6">A4 (210x297)</option>
+                <option value="297x420|30|30|15|15|6">A3 (297x420)</option>
+                <option value="420x594|40|40|20|20|6">A2 (420x594)</option>
+            </select>
+        </div>
+        <div>
+            <label>Overlap Mode</label>
+            <select id="overlapMode">
+                <option value="yes">Active Overlap</option>
+                <option value="no">Flush (No Overlap)</option>
+            </select>
+        </div>
     </div>
-  </div>
+
+    <h3>1. Artwork & Matting</h3>
+    <div class="grid">
+        <div><label>Art Width (mm)</label><input id="picW" value="210"></div>
+        <div><label>Art Height (mm)</label><input id="picH" value="297"></div>
+    </div>
+    <div class="grid">
+        <div><label>Mat Border Width (mm)</label><input id="matW" value="50"></div>
+        <div><label>Mat Border Height (mm)</label><input id="matH" value="50"></div>
+    </div>
+
+    <label id="overlapLabel">Mat Overlap per side (mm)</label>
+    <div class="overlap-grid" id="overlapFields">
+        <div><label style="font-size:10px">Top</label><input id="matPicOT" value="5"></div>
+        <div><label style="font-size:10px">Bottom</label><input id="matPicOB" value="5"></div>
+        <div><label style="font-size:10px">Left</label><input id="matPicOL" value="5"></div>
+        <div><label style="font-size:10px">Right</label><input id="matPicOR" value="5"></div>
+    </div>
+
+    <h3>2. Timber & Stack Thickness</h3>
+    <div class="triple-grid">
+        <div><label>Face Width</label><input id="fmW" value="30"></div>
+        <div><label>Timber Depth</label><input id="fmH" value="20"></div>
+        <div><label>Rebate Depth</label><input id="inset" value="10"></div>
+    </div>
+    <div class="triple-grid">
+        <div><label>Glass (mm)</label><input id="tGlass" value="3"></div>
+        <div><label>Mat (mm)</label><input id="tMat" value="1.5"></div>
+        <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
+    </div>
+    <div class="grid">
+        <div><label>Clearance (mm)</label><input id="tolerance" value="2"></div>
+    </div>
+
+    <h3>3. Material Stock & Ordering</h3>
+    <div class="grid">
+        <div>
+            <label>Stock Stick Length (mm)</label>
+            <input id="stickLen" value="2400">
+        </div>
+        <div>
+            <label>Waste Margin (%)</label>
+            <input id="wastePercent" value="10">
+        </div>
+    </div>
+
+    <div class="results-section">
+        <div class="res-card"><label style="font-size:0.6rem">MAT WINDOW</label><span class="val" id="windowResult">—</span></div>
+        <div class="res-card"><label style="font-size:0.6rem">GLASS SIZE</label><span class="val" id="glassResult">—</span></div>
+        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER WIDTH</label><span class="val" id="outFrmW">—</span></div>
+        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER HEIGHT</label><span class="val" id="outFrmH">—</span></div>
+        <div class="res-card timber" style="border-left-color: #27ae60; background: #f0fff4;">
+            <label style="font-size:0.6rem">ORDERING TOTAL</label>
+            <span class="val" id="totalTimber">—</span>
+            <div id="stickCount" style="font-size: 0.7rem; color: #666; margin-top:2px;"></div>
+        </div>
+    </div>
+
+
+
+    <div class="btn-group">
+        <button id="resetBtn">Reset</button>
+        <button id="copyBtn">Copy Dimensions</button>
+    </div>
+
+    <div class="preview-layout">
+        <div class="preview-box">
+            <span class="preview-label">Live Workshop Preview</span>
+            <div id="frame-preview" style="background:#4a2c16; position:relative;">
+                <div id="mat-preview" style="background:#fdfdfd;">
+                    <div id="pic-preview" style="position:absolute; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: bold; color: #2980b9;">ART</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-box">
+            <span class="preview-label">Side-Profile Stack</span>
+            <div id="fit-status"></div>
+            <div class="legend">
+                <div class="legend-item"><div class="swatch" style="background:var(--timber)"></div>Timber</div>
+                <div class="legend-item"><div class="swatch" style="background:var(--glass)"></div>Glass</div>
+                <div class="legend-item"><div class="swatch" style="background:#fff"></div>Mat</div>
+                <div class="legend-item"><div class="swatch" style="background:var(--backing)"></div>Backing</div>
+            </div>
+            <div class="cs-container">
+                <div class="cs-timber" id="cs-timber"></div>
+                <div class="cs-stack" id="cs-stack">
+                    <div class="cs-layer" id="vBack" style="background:var(--backing)"></div>
+                    <div class="cs-layer" id="vMat" style="background:#fff"></div>
+                    <div class="cs-layer" id="vGlass" style="background:var(--glass)"></div>
+                </div>
+                <div class="cs-axis" style="bottom: -18px; width: 60%; text-align: center;">FACE</div>
+                <div class="cs-axis" style="left: -35px; top: 50%; transform: rotate(-90deg);">DEPTH</div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 <script>
-// Converts "600mm", "60cm", "0.6m" -> mm
-function toMM(val){
-    if(!val) return 0;
-    val = val.toString().trim().toLowerCase();
-    if(val.endsWith("mm")) return parseFloat(val);
-    if(val.endsWith("cm")) return parseFloat(val)*10;
-    if(val.endsWith("m"))  return parseFloat(val)*1000;
-    return parseFloat(val);
+const scale = 0.5;
+const csScale = 4; // Scale for profile view
+
+function toMM(val) {
+    if (!val) return 0;
+    let num = parseFloat(val);
+    return isNaN(num) ? 0 : num;
 }
 
-// Elements
-let picWEl = document.getElementById("picW");
-let picHEl = document.getElementById("picH");
-let matWEl = document.getElementById("matW");
-let matHEl = document.getElementById("matH");
-let matPOTEl = document.getElementById("matPicOT");
-let matPOBEl = document.getElementById("matPicOB");
-let matPOLEl = document.getElementById("matPicOL");
-let matPOREl = document.getElementById("matPicOR");  
-let fmWEl  = document.getElementById("fmW");
-let fmHEl  = document.getElementById("fmH");
-let insetEl= document.getElementById("inset");
-let presetSelectEl = document.getElementById("presetSelect");
-const frameEl = document.getElementById("frame-preview");
-const matEl   = document.getElementById("mat-preview");
-const picEl   = document.getElementById("pic-preview");
-let overlapMode = document.getElementById("overlapMode");
-  
-let scale = 0.5; // 0.5px per mm
+const inputIds = ["picW", "picH", "matW", "matH", "matPicOT", "matPicOB", "matPicOL", "matPicOR", "fmW", "fmH", "inset", "tolerance", "tGlass", "tMat", "tBack", "stickLen", "wastePercent"];
+const overlapInputs = ["matPicOT", "matPicOB", "matPicOL", "matPicOR"];
 
-// Main calculation
+function updateOverlapUI() {
+    const mode = document.getElementById("overlapMode").value;
+    const isNoOverlap = mode === "no";
+    document.getElementById("overlapLabel").className = isNoOverlap ? "disabled-label" : "";
+    overlapInputs.forEach(id => { document.getElementById(id).disabled = isNoOverlap; });
+}
+
 function calc() {
-    let picW = toMM(picWEl.value) || 0;
-    let picH = toMM(picHEl.value) || 0;
-    let matW = toMM(matWEl.value) || 0;
-    let matH = toMM(matHEl.value) || 0;
-    let matPOT = toMM(matPOTEl.value) || 5;
-    let matPOB = toMM(matPOBEl.value) || 5;
-    let matPOL = toMM(matPOLEl.value) || 5;
-    let matPOR = toMM(matPOREl.value) || 5;
-    let fmW  = toMM(fmWEl.value) || 0;
-    let fmH  = toMM(fmHEl.value) || 0;
-    let inset= toMM(insetEl.value) || 6;
+    const v = {};
+    // Preserving your input collection logic
+    inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        v[id] = el ? parseFloat(el.value) || 0 : 0;
+    });
 
-    // Only alert if a value is negative
-    if(picW < 0 || picH < 0 || matW < 0 || matH < 0 || fmW < 0 || fmH < 0 || inset < 0){
-        alert("Dimensions cannot be negative!");
-        return;
-    }
-    // this doesn't factor - should be in toMM.  Could prob delete
-    if (isNaN(picW) || isNaN(picH) || isNaN(matW) || isNaN(matH) || 
-        isNaN(fmW) || isNaN(fmH) || isNaN(inset)) {
-        alert("Inputs must be numeric!");
-        return;
-    }
-  
-    // Skip calculation if picture dimensions are zero (not filled yet)
-    if(picW === 0 || picH === 0){
-        document.getElementById("outFrmW").textContent = "—";
-        document.getElementById("outFrmH").textContent = "—";
-        document.getElementById("outInsW").textContent = "—";
-        document.getElementById("outInsH").textContent = "—";
-      
-        frameEl.style.width = frameEl.style.height = "0px";
-        matEl.style.width = matEl.style.height = "0px";
-        picEl.style.width = picEl.style.height = "0px";
-        return;
-    }
+    const mode = document.getElementById("overlapMode").value;
+    if (v.picW <= 0 || v.picH <= 0) return;
 
-    // calc it!
-    // get the total width/height, then subtract the overlaps
-    const safe = v => Number.isFinite(v) ? v : 0;    
-    let frameWidth =
-      safe(picW) + safe(matW) * 2 + safe(fmW) * 2 - safe(inset) * 2;    
-    let frameHeight =
-      safe(picH) + safe(matH) * 2 + safe(fmH) * 2 - safe(inset) * 2;    
-    if (overlapMode.value === "yes") {
-      frameWidth -= safe(matPOL) + safe(matPOR);
-      frameHeight -= safe(matPOT) + safe(matPOB);
-    }
-  
-    document.getElementById("outFrmW").textContent = Math.round(frameWidth)+" mm";
-    document.getElementById("outFrmH").textContent = Math.round(frameHeight)+" mm";
-    document.getElementById("outInsW").textContent = Math.round(picW+(matW*2))+" mm";
-    document.getElementById("outInsH").textContent = Math.round(picH+(matH*2))+" mm";
-  
-    // Update preview
-    frameEl.style.width  = (frameWidth*scale)+"px";
-    frameEl.style.height = (frameHeight*scale)+"px";
-    frameEl.style.position = "relative";
+    // 1. Math (Your Original Logic)
+    let winW = mode === "no" ? v.picW : v.picW - (v.matPicOL + v.matPicOR);
+    let winH = mode === "no" ? v.picH : v.picH - (v.matPicOT + v.matPicOB);
+    let glassW = v.picW + (v.matW * 2) - (mode === "yes" ? (v.matPicOL + v.matPicOR) : 0) + v.tolerance;
+    let glassH = v.picH + (v.matH * 2) - (mode === "yes" ? (v.matPicOT + v.matPicOB) : 0) + v.tolerance;
+    let cutW = glassW + (2 * (v.fmW - v.inset));
+    let cutH = glassH + (2 * (v.fmW - v.inset));
 
-    let matWidth  = picW + (matW * 2);
-    let matHeight = picH + (matH * 2);    
-    if (overlapMode.value === "yes") {
-      matWidth  -= (matPOL + matPOR);
-      matHeight -= (matPOT + matPOB);
-    }    
-    matEl.style.width  = (matWidth  * scale) + "px";
-    matEl.style.height = (matHeight * scale) + "px";
+    document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
+    document.getElementById("glassResult").innerText = Math.round(glassW) + "x" + Math.round(glassH) + " mm";
+    document.getElementById("outFrmW").innerText = Math.round(cutW) + " mm";
+    document.getElementById("outFrmH").innerText = Math.round(cutH) + " mm";
 
-    matEl.style.top = ((fmH - inset)*scale)+"px"; 
-    matEl.style.left = ((fmW - inset)*scale)+"px";
-  
- 
-    picEl.style.width  = (picW*scale)+"px";
-    picEl.style.height = (picH*scale)+"px";
+    // --- NEW: Timber Ordering Logic (Inserted here to avoid breaking UI updates) ---
+    const netLinear = (cutW * 2) + (cutH * 2);
+    const wasteMultiplier = 1 + (v.wastePercent / 100);
+    const grossLinear = Math.round(netLinear * wasteMultiplier); 
+    const sticksNeeded = Math.ceil(grossLinear / v.stickLen);
 
-  
-    let picTop  = matH;
-    let picLeft = matW;    
-    if (overlapMode.value === "yes") {
-      picTop  -= matPOT;
-      picLeft -= matPOL;
-    }    
-    picEl.style.top  = (picTop  * scale) + "px";
-    picEl.style.left = (picLeft * scale) + "px";
+    document.getElementById("totalTimber").innerText = (grossLinear / 1000).toFixed(2) + " m";
+    document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm sticks`;
 
+    // 2. Front Preview (Your Original Logic)
+    const fv = document.getElementById("frame-preview");
+    const mv = document.getElementById("mat-preview");
+    const pv = document.getElementById("pic-preview");
+    fv.style.width = (cutW * scale) + "px";
+    fv.style.height = (cutH * scale) + "px";
+    mv.style.width = (glassW * scale) + "px";
+    mv.style.height = (glassH * scale) + "px";
+    mv.style.left = mv.style.top = ((v.fmW - v.inset) * scale) + "px";
+    pv.style.width = (v.picW * scale) + "px";
+    pv.style.height = (v.picH * scale) + "px";
+    let pTop = v.matH + (v.tolerance / 2);
+    let pLeft = v.matW + (v.tolerance / 2);
+    if (mode === "yes") { pTop -= v.matPicOT; pLeft -= v.matPicOL; }
+    pv.style.top = (pTop * scale) + "px";
+    pv.style.left = (pLeft * scale) + "px";
 
-  
-  /*
-  console.log("Preview frame width: ", (frameWidth*scale)+"px");
-  console.log("Preview frame height: ", (frameHeight*scale)+"px");
-  console.log("Preview mat width: ", ((picW + matW*2)*scale)+"px");
-  console.log("Preview mat height: ", ((picH + matH*2)*scale)+"px");
-  console.log("Preview mat top: ", (fmH*scale - inset*scale)+"px");
-  console.log("Preview mat left: ", (fmW*scale - inset*scale)+"px");
-  console.log("Preview picture width: ", (picW*scale)+"px");
-  console.log("Preview picture height: ", (picH*scale)+"px");
-  console.log("Preview picture top: ", (matH*scale)+"px");
-  console.log("Preview picture left: ", (matW*scale)+"px");
-  */
-  
-};
+    // 3. Side Profile Update (Your Original Proportional Logic)
+    const stackTotal = v.tGlass + v.tMat + v.tBack;
+    const remain = v.inset - stackTotal;
+    const timber = document.getElementById("cs-timber");
+    const stack = document.getElementById("cs-stack");
+    
+    // Set timber dimensions
+    const tw = v.fmW * csScale;
+    const th = v.fmH * csScale;
+    const rd = v.inset * csScale; 
+    const rw = (v.fmW * 0.4) * csScale; 
 
+    timber.style.width = tw + "px";
+    timber.style.height = th + "px";
 
-// Local storage
-function saveToLocalStorage() {
-    localStorage.setItem("picW", picWEl.value);
-    localStorage.setItem("picH", picHEl.value);
-    localStorage.setItem("matW", matWEl.value);
-    localStorage.setItem("matH", matHEl.value);
-    localStorage.setItem("fmW", fmWEl.value);
-    localStorage.setItem("fmH", fmHEl.value);
-    localStorage.setItem("inset", insetEl.value);
-    localStorage.setItem("presetSelect", presetSelectEl.value);
-    localStorage.setItem("matPicOT", matPOTEl.value);
-    localStorage.setItem("matPicOB", matPOBEl.value);
-    localStorage.setItem("matPicOL", matPOLEl.value);
-    localStorage.setItem("matPicOR", matPOREl.value);
+    // Clip path logic (Your notch logic)
+    const rebatePctY = (rd / th) * 100;
+    const rebatePctX = 60; 
+    timber.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${rebatePctY}%, ${rebatePctX}% ${rebatePctY}%, ${rebatePctX}% 100%, 0% 100%)`;
+
+    // Position Stack inside the notch
+    stack.style.width = (tw * 0.4) + "px"; 
+    stack.style.left = (tw * 0.6) + "px";
+    stack.style.bottom = (th - rd) + "px";
+
+    document.getElementById("vGlass").style.height = (v.tGlass * csScale) + "px";
+    document.getElementById("vMat").style.height = (v.tMat * csScale) + "px";
+    document.getElementById("vBack").style.height = (v.tBack * csScale) + "px";
+
+    const status = document.getElementById("fit-status");
+    status.innerText = remain >= 0 ? `FIT: OK (${remain.toFixed(1)}mm left)` : `TOO THICK (${Math.abs(remain).toFixed(1)}mm overlap)`;
+    status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
 }
-
-function loadFromLocalStorage() {
-    if(localStorage.getItem("picW")) picWEl.value = localStorage.getItem("picW");
-    if(localStorage.getItem("picH")) picHEl.value = localStorage.getItem("picH");
-    if(localStorage.getItem("matW")) matWEl.value = localStorage.getItem("matW");
-    if(localStorage.getItem("matH")) matHEl.value = localStorage.getItem("matH");
-    if(localStorage.getItem("fmW"))  fmWEl.value = localStorage.getItem("fmW");
-    if(localStorage.getItem("fmH"))  fmHEl.value = localStorage.getItem("fmH");
-    if(localStorage.getItem("inset")) insetEl.value = localStorage.getItem("inset");
-    if(localStorage.getItem("presetSelect")) presetSelectEl.value = localStorage.getItem("presetSelect");
-    if(localStorage.getItem("matPicOT")) matPOTEl.value = localStorage.getItem("matPicOT");
-    if(localStorage.getItem("matPicOB")) matPOBEl.value = localStorage.getItem("matPicOB");
-    if(localStorage.getItem("matPicOL")) matPOLEl.value = localStorage.getItem("matPicOL");
-    if(localStorage.getItem("matPicOR")) matPOREl.value = localStorage.getItem("matPicOR");
-}
-
-// Event listeners
-document.querySelectorAll("input").forEach(el => {
+document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", () => {
-        saveToLocalStorage();
+        if (el.id === "overlapMode") updateOverlapUI();
         calc();
     });
 });
 
-// Reset button
-document.getElementById("resetBtn").addEventListener("click", () => {
-    // Clear local storage
-    localStorage.clear();
-    
-    // Clear inputs
-    picWEl.value = '';
-    picHEl.value = '';
-    matWEl.value = '';
-    matHEl.value = '';
-    fmWEl.value = '';
-    fmHEl.value = '';
-    insetEl.value = '6mm';
-    presetSelectEl.value = '';
-    
-    // Reset output display
-    document.getElementById("outFrmW").textContent = "—";
-    document.getElementById("outFrmH").textContent = "—";
-
-    // Reset preview
-    frameEl.style.width = frameEl.style.height = "0px";
-    matEl.style.width = matEl.style.height = "0px";
-    picEl.style.width = picEl.style.height = "0px";
+document.getElementById("presetSelect").addEventListener("change", (e) => {
+    if (!e.target.value) return;
+    const [dim, mW, mH, fW, fH, ins] = e.target.value.split("|");
+    const [w, h] = dim.split("x");
+    document.getElementById("picW").value = w; document.getElementById("picH").value = h;
+    document.getElementById("matW").value = mW; document.getElementById("matH").value = mH;
+    document.getElementById("fmW").value = fW; document.getElementById("fmH").value = fH;
+    document.getElementById("inset").value = ins;
+    calc();
 });
 
-// Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
-    const pw = picWEl.value || "0mm";
-    const ph = picHEl.value || "0mm";
-    const mw = matWEl.value || "0mm";
-    const mh = matHEl.value || "0mm";
-    const fw = fmWEl.value || "0mm";
-    const fh = fmHEl.value || "0mm";
-    const inset = insetEl.value || "6mm"; // default inset if empty
-    const totalFrmW = document.getElementById("outFrmW").textContent || "0 mm";
-    const totalFrmH = document.getElementById("outFrmH").textContent || "0 mm";
-    const totalInsW = document.getElementById("outInsW").textContent || "0 mm";
-    const totalInsH = document.getElementById("outInsH").textContent || "0 mm";
-  
-    const txt = `Picture: ${pw} x ${ph}
-Mat: ${mw} x ${mh}
-Frame: ${fw} x ${fh}
-Inset: ${inset}
-Total Frame: W ${totalFrmW} x H ${totalFrmH}
-Total Inset: W ${totalInsW} x H ${totalInsH}`;
+    // Get values directly from the UI results
+    const results = {
+        win: document.getElementById("windowResult").innerText,
+        glass: document.getElementById("glassResult").innerText,
+        frameW: document.getElementById("outFrmW").innerText,
+        frameH: document.getElementById("outFrmH").innerText,
+        total: document.getElementById("totalTimber").innerText,
+        sticks: document.getElementById("stickCount").innerText
+    };
 
-    navigator.clipboard.writeText(txt).then(() => {
-        alert("Results copied to clipboard!");
-    }).catch(err => {
-        console.error("Copy failed:", err);
-        alert("Unable to copy results.");
-    });
+    const text = `
+FRAME ORDER SUMMARY:
+--------------------
+Timber Cuts: 2 @ ${results.frameW}, 2 @ ${results.frameH}
+Glass/Backing: ${results.glass}
+Mat Window: ${results.win}
+
+ORDERING:
+Total Timber: ${results.total}
+Required: ${results.sticks}
+    `.trim();
+
+    navigator.clipboard.writeText(text).then(() => alert("Shopping list copied!"));
 });
 
+document.getElementById("resetBtn").addEventListener("click", () => { location.reload(); });
 
-overlapMode.addEventListener("change", () => {
-  if (overlapMode.value === "no") {
-    matPOTEl.disabled = true;
-    matPOBEl.disabled = true;
-    matPOLEl.disabled = true;
-    matPOREl.disabled = true;    
-  } else {
-    matPOTEl.disabled = false;
-    matPOBEl.disabled = false;
-    matPOLEl.disabled = false;
-    matPOREl.disabled = false;        
-  }
-
-  calc(); // keep your live recalculation
-});
-  
-
-// presetSelect selection
-presetSelectEl.addEventListener("change", () => {
-    if(!presetSelectEl.value) return;
-    const [pic, mat, frame, inset] = presetSelectEl.value.split("|");
-    const [pw, ph] = pic.split("x");
-    picWEl.value = pw + "mm";
-    picHEl.value = ph + "mm";
-    matWEl.value = mat + "mm";
-    matHEl.value = mat + "mm";
-    fmWEl.value = frame + "mm";
-    fmHEl.value = frame + "mm";
-    insetEl.value = inset + "mm";
-    saveToLocalStorage();
-    calc();
-});
-
-// Load values and calculate on page load
-window.addEventListener("DOMContentLoaded", () => {
-    loadFromLocalStorage();
-    calc();
-});
+window.onload = calc;
 </script>
 
 </body>
