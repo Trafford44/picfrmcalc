@@ -108,8 +108,27 @@
 <body>
 
 <div class="card">
-    <h1>Frame Master Pro</h1>
+    <h1>Frame Calculator</h1>
+    <h3>Projects</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <label>Project Name</label>
+            <div style="display: flex; gap: 5px;">
+                <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 1;">
+                <button id="saveProjectBtn" style="background: #27ae60; color: white; width: 80px; padding: 0;">Save</button>
+            </div>
+        </div>
 
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <label>Load Saved</label>
+            <div style="display: flex; gap: 5px;">
+                <select id="loadProjectSelect" style="flex: 1;">
+                    <option value="">-- Load Saved --</option>
+                </select>
+                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 40px; padding: 0;">Delete</button>
+            </div>
+        </div>
+    </div>
     <div class="grid">
         <div>
             <label>Presets <span class="info-icon" data-tooltip="Standard international paper sizes to speed up entry.">i</span></label>
@@ -227,6 +246,9 @@
 <script>
 const scale = 0.5;
 const csScale = 4;
+// --- PROJECT STORAGE LOGIC ---
+const STORAGE_KEY = "frameCalcLibrary";
+const SESSION_KEY = "frameCalcCurrentSession";
 
 function toMM(val) {
     if (!val) return 0;
@@ -244,27 +266,28 @@ function updateOverlapUI() {
     overlapInputs.forEach(id => { document.getElementById(id).disabled = isNoOverlap; });
 }
 
-
-function saveToLocal() {
-    const data = {};
-    inputIds.forEach(id => {
-        data[id] = document.getElementById(id).value;
-    });
-    data.overlapMode = document.getElementById("overlapMode").value;
-    localStorage.setItem("frameCalcData", JSON.stringify(data));
+function getLibrary() {
+    const lib = localStorage.getItem(STORAGE_KEY);
+    return lib ? JSON.parse(lib) : {};
 }
 
-function loadFromLocal() {
-    const saved = localStorage.getItem("frameCalcData");
-    if (saved) {
-        const data = JSON.parse(saved);
-        // Fill all inputs
-        inputIds.forEach(id => {
-            if (data[id] !== undefined) document.getElementById(id).value = data[id];
-        });
-        // Fill the dropdown
-        if (data.overlapMode) document.getElementById("overlapMode").value = data.overlapMode;
-    }
+
+// 1. PROJECT STORAGE LOGIC
+function getProjects() {
+    const projects = localStorage.getItem("frameCalcProjects");
+    return projects ? JSON.parse(projects) : {};
+}
+
+function updateProjectDropdown() {
+    const lib = getLibrary();
+    const select = document.getElementById("loadProjectSelect");
+    select.innerHTML = '<option value="">-- Load Saved --</option>';
+    Object.keys(lib).sort().forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+    });
 }
 
 function calc() {
@@ -342,12 +365,64 @@ function calc() {
     status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
 }
 
+// Auto-save current state (Session persistence)
+function autoSaveCurrentState() {
+    const data = { overlapMode: document.getElementById("overlapMode").value };
+    inputIds.forEach(id => data[id] = document.getElementById(id).value);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+}
+
 document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", () => {
         if (el.id === "overlapMode") updateOverlapUI();
         calc();
-        saveToLocal(); // Save every change
+        autoSaveCurrentState(); 
     });
+});
+
+// Save specific project
+document.getElementById("saveProjectBtn").addEventListener("click", () => {
+    const name = document.getElementById("projectName").value.trim();
+    if (!name) { alert("Please enter a name for this project first."); return; }
+
+    const lib = getLibrary();
+    const data = { overlapMode: document.getElementById("overlapMode").value };
+    inputIds.forEach(id => data[id] = document.getElementById(id).value);
+    
+    lib[name] = data;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
+    updateProjectDropdown();
+    alert("Project '" + name + "' saved to library.");
+});
+
+// Delete specific project
+document.getElementById("deleteProjectBtn").addEventListener("click", () => {
+    const name = document.getElementById("loadProjectSelect").value;
+    if (!name) return;
+    if (confirm(`Delete project "${name}" forever?`)) {
+        const lib = getLibrary();
+        delete lib[name];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
+        updateProjectDropdown();
+        document.getElementById("projectName").value = "";
+    }
+});
+
+// Load project from list
+document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
+    const name = e.target.value;
+    if (!name) return;
+    const lib = getLibrary();
+    const data = lib[name];
+    if (data) {
+        document.getElementById("projectName").value = name;
+        document.getElementById("overlapMode").value = data.overlapMode;
+        inputIds.forEach(id => {
+            if (data[id] !== undefined) document.getElementById(id).value = data[id];
+        });
+        updateOverlapUI();
+        calc();
+    }
 });
 
 document.getElementById("presetSelect").addEventListener("change", (e) => {
@@ -362,7 +437,7 @@ document.getElementById("presetSelect").addEventListener("change", (e) => {
     document.getElementById("fmH").value = fH;
     document.getElementById("inset").value = ins;
     calc();
-    saveToLocal(); // Save after preset application
+    autoSaveCurrentState(); // Save after preset application
 });
 
 document.getElementById("copyBtn").addEventListener("click", () => {
@@ -378,15 +453,27 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     navigator.clipboard.writeText(text).then(() => alert("Shopping list copied!"));
 });
 
-document.getElementById("resetBtn").addEventListener("click", () => { 
-    localStorage.removeItem("frameCalcData"); // Clear data on reset
-    location.reload(); 
+document.getElementById("resetBtn").addEventListener("click", () => {
+    if(confirm("Clear current inputs? (This won't delete saved projects)")) {
+        // Clear just the inputs, not the whole library
+        document.getElementById("projectName").value = "";
+        location.reload(); 
+    }
 });
 
+// Modify onload to restore session
 window.onload = () => {
-    loadFromLocal();   // Load data first
-    updateOverlapUI(); // Set UI state
-    calc();            // Run calculation
+    updateProjectDropdown();
+    const lastSession = localStorage.getItem(SESSION_KEY);
+    if (lastSession) {
+        const data = JSON.parse(lastSession);
+        if (data.overlapMode) document.getElementById("overlapMode").value = data.overlapMode;
+        inputIds.forEach(id => {
+            if (data[id] !== undefined) document.getElementById(id).value = data[id];
+        });
+    }
+    updateOverlapUI();
+    calc();
 };
 </script>
 </body>
