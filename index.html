@@ -25,56 +25,23 @@
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
         .triple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-        .overlap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; transition: opacity 0.3s ease; }
+        .quad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         
         label { display: block; font-weight: 600; font-size: 0.8rem; margin-bottom: 5px; color: #444; position: relative; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; height: 40px;}
         
         input:disabled { background-color: #f2f2f2; color: #aaa; cursor: not-allowed; }
         .disabled-label { color: var(--disabled) !important; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; height: 40px;}
         #resetBtn { background: #ecf0f1; color: #7f8c8d; }
         #copyBtn { background: var(--primary); color: white; }
 
-        /* INFO ICONS & TOOLTIPS */
-        .info-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 14px;
-            height: 14px;
-            background: #bdc3c7;
-            color: white;
-            border-radius: 50%;
-            font-size: 10px;
-            margin-left: 5px;
-            cursor: help;
-            vertical-align: middle;
-        }
+        .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; background: #bdc3c7; color: white; border-radius: 50%; font-size: 10px; margin-left: 5px; cursor: help; vertical-align: middle; }
         .info-icon:hover { background: var(--primary); }
-        
         [data-tooltip] { position: relative; }
-        [data-tooltip]:before {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #2c3e50;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: normal;
-            line-height: 1.4;
-            width: 200px;
-            text-align: center;
-            display: none;
-            z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
+        [data-tooltip]:before { content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #2c3e50; color: white; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: normal; line-height: 1.4; width: 200px; text-align: center; display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         [data-tooltip]:hover:before { display: block; }
 
         .results-section { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
@@ -84,7 +51,6 @@
 
         .preview-layout { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
         @media (min-width: 700px) { .preview-layout { grid-template-columns: 1.2fr 0.8fr; } }
-
         .preview-box { background: #e0e0e0; padding: 20px; border-radius: 8px; border: 1px inset #ccc; display: flex; flex-direction: column; align-items: center; min-height: 400px; position: relative; overflow: hidden; }
         .preview-label { font-size: 10px; font-weight: bold; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; }
 
@@ -96,7 +62,6 @@
         .legend-item { display: flex; align-items: center; }
         .swatch { width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; border: 1px solid #888; }
 
-        /* REVISED CROSS SECTION */
         .cs-container { position: relative; width: 180px; height: 180px; margin-top: 40px; display: flex; align-items: flex-end; justify-content: flex-start; }
         .cs-timber { position: absolute; bottom: 0; left: 0; background: var(--timber); z-index: 5; }
         .cs-stack { position: absolute; z-index: 10; display: flex; flex-direction: column-reverse; }
@@ -108,7 +73,8 @@
 <body>
 
 <div class="card">
-    <h1>Frame Calculator</h1>
+    <h1>Picture Frame Calculator</h1>
+    
     <h3>Projects</h3>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end;">
         <div style="display: flex; flex-direction: column; gap: 5px;">
@@ -118,29 +84,26 @@
                 <button id="saveProjectBtn" style="background: #27ae60; color: white; width: 80px; padding: 0;">Save</button>
             </div>
         </div>
-
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Load Saved</label>
             <div style="display: flex; gap: 5px;">
-                <select id="loadProjectSelect" style="flex: 1;">
-                    <option value="">-- Load Saved --</option>
-                </select>
-                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 40px; padding: 0;">Delete</button>
+                <select id="loadProjectSelect" style="flex: 1;"><option value="">-- Load Saved --</option></select>
+                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 50px; padding: 0;">Delete</button>
             </div>
         </div>
     </div>
+
     <div class="grid">
         <div>
-            <label>Presets <span class="info-icon" data-tooltip="Standard international paper sizes to speed up entry.">i</span></label>
+            <label>Presets <span class="info-icon" data-tooltip="Common frame setups.">i</span></label>
             <select id="presetSelect">
                 <option value="">-- Choose a Size --</option>
-                <option value="210x297|20|20|10|10|6">A4 (210x297)</option>
-                <option value="297x420|30|30|15|15|6">A3 (297x420)</option>
-                <option value="420x594|40|40|20|20|6">A2 (420x594)</option>
+                <option value="210|297|50|50|50|50|5">A4 (50mm Borders)</option>
+                <option value="297|420|60|80|60|60|5">A3 (Weighted Bottom)</option>
             </select>
         </div>
         <div>
-            <label>Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board covers the edge of the artwork so it doesn't fall through.">i</span></label>
+            <label>Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board 'bites' the art.">i</span></label>
             <select id="overlapMode">
                 <option value="yes">Active Overlap</option>
                 <option value="no">Flush (No Overlap)</option>
@@ -153,44 +116,43 @@
         <div><label>Art Width (mm)</label><input id="picW" value="210"></div>
         <div><label>Art Height (mm)</label><input id="picH" value="297"></div>
     </div>
-    <div class="grid">
-        <div><label>Mat Border Width (mm) <span class="info-icon" data-tooltip="Width of the mat board margin. Standard is 50mm for medium frames.">i</span></label><input id="matW" value="50"></div>
-        <div><label>Mat Border Height (mm)</label><input id="matH" value="50"></div>
+
+    <label>
+        Mat Border Widths (mm) 
+        <button onclick="syncBorders()" style="display: inline-block; margin-left: 10px; padding: 2px 8px; font-size: 10px; height: 22px; width: auto; background: #95a5a6; color: white; vertical-align: middle;">🔗 Sync All</button>
+        <span class="info-icon" data-tooltip="Width of the mat board on each side.">i</span>
+    </label>
+    <div class="quad-grid">
+        <div><label style="font-size:10px">Top</label><input id="matT" value="50"></div>
+        <div><label style="font-size:10px">Bottom</label><input id="matB" value="50"></div>
+        <div><label style="font-size:10px">Left</label><input id="matL" value="50"></div>
+        <div><label style="font-size:10px">Right</label><input id="matR" value="50"></div>
     </div>
 
-    <label id="overlapLabel">Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm. This is how much the mat board 'bites' into the artwork area.">i</span></label>
-    <div class="overlap-grid" id="overlapFields">
-        <div><label style="font-size:10px">Top</label><input id="matPicOT" value="5"></div>
-        <div><label style="font-size:10px">Bottom</label><input id="matPicOB" value="5"></div>
-        <div><label style="font-size:10px">Left</label><input id="matPicOL" value="5"></div>
-        <div><label style="font-size:10px">Right</label><input id="matPicOR" value="5"></div>
+    <div style="margin-top:15px">
+        <label id="overlapLabel">Art Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm.">i</span></label>
+        <input id="overlap" value="5">
     </div>
 
     <h3>2. Timber & Stack Thickness</h3>
     <div class="triple-grid">
-        <div><label>Face Width <span class="info-icon" data-tooltip="The visible width of the timber when looking at the frame from the front.">i</span></label><input id="fmW" value="30"></div>
-        <div><label>Timber Depth <span class="info-icon" data-tooltip="The total thickness of the timber from front to back.">i</span></label><input id="fmH" value="20"></div>
-        <div><label>Rebate Depth <span class="info-icon" data-tooltip="The depth of the 'notch' where glass and art sit. Must be deeper than your stack total.">i</span></label><input id="inset" value="10"></div>
+        <div><label>Face Width</label><input id="fmW" value="30"></div>
+        <div><label>Timber Depth</label><input id="fmH" value="20"></div>
+        <div><label>Rebate Depth</label><input id="inset" value="10"></div>
     </div>
     <div class="triple-grid">
-        <div><label>Glass (mm) <span class="info-icon" data-tooltip="Standard picture glass is 2mm-3mm. Acrylic is often 3mm.">i</span></label><input id="tGlass" value="3"></div>
-        <div><label>Mat (mm) <span class="info-icon" data-tooltip="Standard 4-ply mat board is approx 1.4mm - 1.6mm.">i</span></label><input id="tMat" value="1.5"></div>
-        <div><label>Backing (mm) <span class="info-icon" data-tooltip="Standard foam-core or MDF backing is 3mm - 5mm.">i</span></label><input id="tBack" value="3"></div>
+        <div><label>Glass (mm)</label><input id="tGlass" value="3"></div>
+        <div><label>Mat (mm)</label><input id="tMat" value="1.5"></div>
+        <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
     </div>
     <div class="grid">
-        <div><label>Clearance (mm) <span class="info-icon" data-tooltip="Industry standard is 2mm. This expansion gap prevents the glass from cracking as wood moves.">i</span></label><input id="tolerance" value="2"></div>
+        <div><label>Clearance (mm)</label><input id="tolerance" value="2"></div>
     </div>
 
     <h3>3. Material Stock & Ordering</h3>
     <div class="grid">
-        <div>
-            <label>Stock Stick Length (mm) <span class="info-icon" data-tooltip="The length of the raw timber moulding sticks you purchase (e.g., 2400mm or 3000mm).">i</span></label>
-            <input id="stickLen" value="2400">
-        </div>
-        <div>
-            <label>Waste Margin (%) <span class="info-icon" data-tooltip="Standard is 10-15%. Accounts for saw blade width (kerf) and wood knots/flaws.">i</span></label>
-            <input id="wastePercent" value="10">
-        </div>
+        <div><label>Timber Length (mm)</label><input id="stickLen" value="2400"></div>
+        <div><label>Waste Margin (%)</label><input id="wastePercent" value="10"></div>
     </div>
 
     <div class="results-section">
@@ -246,37 +208,12 @@
 <script>
 const scale = 0.5;
 const csScale = 4;
-// --- PROJECT STORAGE LOGIC ---
 const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
 
-function toMM(val) {
-    if (!val) return 0;
-    let num = parseFloat(val);
-    return isNaN(num) ? 0 : num;
-}
+const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "inset", "tolerance", "tGlass", "tMat", "tBack", "stickLen", "wastePercent"];
 
-const inputIds = ["picW", "picH", "matW", "matH", "matPicOT", "matPicOB", "matPicOL", "matPicOR", "fmW", "fmH", "inset", "tolerance", "tGlass", "tMat", "tBack", "stickLen", "wastePercent"];
-const overlapInputs = ["matPicOT", "matPicOB", "matPicOL", "matPicOR"];
-
-function updateOverlapUI() {
-    const mode = document.getElementById("overlapMode").value;
-    const isNoOverlap = mode === "no";
-    document.getElementById("overlapLabel").className = isNoOverlap ? "disabled-label" : "";
-    overlapInputs.forEach(id => { document.getElementById(id).disabled = isNoOverlap; });
-}
-
-function getLibrary() {
-    const lib = localStorage.getItem(STORAGE_KEY);
-    return lib ? JSON.parse(lib) : {};
-}
-
-
-// 1. PROJECT STORAGE LOGIC
-function getProjects() {
-    const projects = localStorage.getItem("frameCalcProjects");
-    return projects ? JSON.parse(projects) : {};
-}
+function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
 
 function updateProjectDropdown() {
     const lib = getLibrary();
@@ -284,10 +221,27 @@ function updateProjectDropdown() {
     select.innerHTML = '<option value="">-- Load Saved --</option>';
     Object.keys(lib).sort().forEach(name => {
         const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
+        opt.value = name; opt.textContent = name;
         select.appendChild(opt);
     });
+}
+
+function updateOverlapUI() {
+    const mode = document.getElementById("overlapMode").value;
+    const isNo = mode === "no";
+    document.getElementById("overlap").disabled = isNo;
+    document.getElementById("overlapLabel").className = isNo ? "disabled-label" : "";
+}
+
+function syncBorders() {
+    const topVal = document.getElementById("matT").value;
+    document.getElementById("matB").value = topVal;
+    document.getElementById("matL").value = topVal;
+    document.getElementById("matR").value = topVal;
+    
+    // Trigger the calculation and auto-save after syncing
+    calc(); 
+    autoSaveCurrentState();
 }
 
 function calc() {
@@ -300,12 +254,20 @@ function calc() {
     const mode = document.getElementById("overlapMode").value;
     if (v.picW <= 0 || v.picH <= 0) return;
 
-    let winW = mode === "no" ? v.picW : v.picW - (v.matPicOL + v.matPicOR);
-    let winH = mode === "no" ? v.picH : v.picH - (v.matPicOT + v.matPicOB);
-    let glassW = v.picW + (v.matW * 2) - (mode === "yes" ? (v.matPicOL + v.matPicOR) : 0) + v.tolerance;
-    let glassH = v.picH + (v.matH * 2) - (mode === "yes" ? (v.matPicOT + v.matPicOB) : 0) + v.tolerance;
-    let cutW = glassW + (2 * (v.fmW - v.inset));
-    let cutH = glassH + (2 * (v.fmW - v.inset));
+    const over = mode === "no" ? 0 : v.overlap;
+
+    // 1. Mat Window Calculation
+    const winW = v.picW - (over * 2);
+    const winH = v.picH - (over * 2);
+
+    // 2. Glass Size Calculation
+    // Total width = ArtWidth + LeftBorder + RightBorder - (2 * overlap) + tolerance
+    const glassW = v.picW + v.matL + v.matR - (over * 2) + v.tolerance;
+    const glassH = v.picH + v.matT + v.matB - (over * 2) + v.tolerance;
+
+    // 3. Timber Cut Calculation
+    const cutW = glassW + (2 * (v.fmW - v.inset));
+    const cutH = glassH + (2 * (v.fmW - v.inset));
 
     document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
     document.getElementById("glassResult").innerText = Math.round(glassW) + "x" + Math.round(glassH) + " mm";
@@ -320,6 +282,7 @@ function calc() {
     document.getElementById("totalTimber").innerText = (grossLinear / 1000).toFixed(2) + " m";
     document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm sticks`;
 
+    // --- WORKSHOP PREVIEW ---
     const fv = document.getElementById("frame-preview");
     const mv = document.getElementById("mat-preview");
     const pv = document.getElementById("pic-preview");
@@ -330,28 +293,24 @@ function calc() {
     mv.style.left = mv.style.top = ((v.fmW - v.inset) * scale) + "px";
     pv.style.width = (v.picW * scale) + "px";
     pv.style.height = (v.picH * scale) + "px";
-    let pTop = v.matH + (v.tolerance / 2);
-    let pLeft = v.matW + (v.tolerance / 2);
-    if (mode === "yes") { pTop -= v.matPicOT; pLeft -= v.matPicOL; }
-    pv.style.top = (pTop * scale) + "px";
-    pv.style.left = (pLeft * scale) + "px";
+    
+    // Positioning the art relative to the mat
+    // The gap from the edge of the glass to the art is (MatBorder - Overlap + HalfTolerance)
+    pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
+    pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
 
+    // --- STACK PREVIEW ---
     const stackTotal = v.tGlass + v.tMat + v.tBack;
     const remain = v.inset - stackTotal;
     const timber = document.getElementById("cs-timber");
     const stack = document.getElementById("cs-stack");
-    
     const tw = v.fmW * csScale;
     const th = v.fmH * csScale;
     const rd = v.inset * csScale; 
 
     timber.style.width = tw + "px";
     timber.style.height = th + "px";
-
-    const rebatePctY = (rd / th) * 100;
-    const rebatePctX = 60; 
-    timber.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${rebatePctY}%, ${rebatePctX}% ${rebatePctY}%, ${rebatePctX}% 100%, 0% 100%)`;
-
+    timber.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${(rd/th)*100}%, 60% ${(rd/th)*100}%, 60% 100%, 0% 100%)`;
     stack.style.width = (tw * 0.4) + "px"; 
     stack.style.left = (tw * 0.6) + "px";
     stack.style.bottom = (th - rd) + "px";
@@ -365,7 +324,6 @@ function calc() {
     status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
 }
 
-// Auto-save current state (Session persistence)
 function autoSaveCurrentState() {
     const data = { overlapMode: document.getElementById("overlapMode").value };
     inputIds.forEach(id => data[id] = document.getElementById(id).value);
@@ -380,100 +338,66 @@ document.querySelectorAll("input, select").forEach(el => {
     });
 });
 
-// Save specific project
 document.getElementById("saveProjectBtn").addEventListener("click", () => {
     const name = document.getElementById("projectName").value.trim();
-    if (!name) { alert("Please enter a name for this project first."); return; }
-
+    if (!name) return alert("Enter project name.");
     const lib = getLibrary();
     const data = { overlapMode: document.getElementById("overlapMode").value };
     inputIds.forEach(id => data[id] = document.getElementById(id).value);
-    
     lib[name] = data;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
     updateProjectDropdown();
-    alert("Project '" + name + "' saved to library.");
+    alert("Project saved.");
 });
 
-// Delete specific project
-document.getElementById("deleteProjectBtn").addEventListener("click", () => {
-    const name = document.getElementById("loadProjectSelect").value;
-    if (!name) return;
-    if (confirm(`Delete project "${name}" forever?`)) {
-        const lib = getLibrary();
-        delete lib[name];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
-        updateProjectDropdown();
-        document.getElementById("projectName").value = "";
+document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
+    const lib = getLibrary();
+    const data = lib[e.target.value];
+    if (data) {
+        document.getElementById("projectName").value = e.target.value;
+        document.getElementById("overlapMode").value = data.overlapMode;
+        inputIds.forEach(id => { if (data[id] !== undefined) document.getElementById(id).value = data[id]; });
+        updateOverlapUI(); calc();
     }
 });
 
-// Load project from list
-document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
-    const name = e.target.value;
-    if (!name) return;
-    const lib = getLibrary();
-    const data = lib[name];
-    if (data) {
-        document.getElementById("projectName").value = name;
-        document.getElementById("overlapMode").value = data.overlapMode;
-        inputIds.forEach(id => {
-            if (data[id] !== undefined) document.getElementById(id).value = data[id];
-        });
-        updateOverlapUI();
-        calc();
+document.getElementById("deleteProjectBtn").addEventListener("click", () => {
+    const name = document.getElementById("loadProjectSelect").value;
+    if (name && confirm(`Delete "${name}"?`)) {
+        const lib = getLibrary(); delete lib[name];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
+        updateProjectDropdown(); document.getElementById("projectName").value = "";
     }
 });
 
 document.getElementById("presetSelect").addEventListener("change", (e) => {
     if (!e.target.value) return;
-    const [dim, mW, mH, fW, fH, ins] = e.target.value.split("|");
-    const [w, h] = dim.split("x");
-    document.getElementById("picW").value = w; 
-    document.getElementById("picH").value = h;
-    document.getElementById("matW").value = mW; 
-    document.getElementById("matH").value = mH;
-    document.getElementById("fmW").value = fW; 
-    document.getElementById("fmH").value = fH;
-    document.getElementById("inset").value = ins;
-    calc();
-    autoSaveCurrentState(); // Save after preset application
+    const [w, h, mt, mb, ml, mr, ov] = e.target.value.split("|");
+    document.getElementById("picW").value = w; document.getElementById("picH").value = h;
+    document.getElementById("matT").value = mt; document.getElementById("matB").value = mb;
+    document.getElementById("matL").value = ml; document.getElementById("matR").value = mr;
+    document.getElementById("overlap").value = ov;
+    calc(); autoSaveCurrentState();
 });
 
 document.getElementById("copyBtn").addEventListener("click", () => {
-    const results = {
-        win: document.getElementById("windowResult").innerText,
-        glass: document.getElementById("glassResult").innerText,
-        frameW: document.getElementById("outFrmW").innerText,
-        frameH: document.getElementById("outFrmH").innerText,
-        total: document.getElementById("totalTimber").innerText,
-        sticks: document.getElementById("stickCount").innerText
-    };
-    const text = `FRAME ORDER SUMMARY:\n--------------------\nTimber Cuts: 2 @ ${results.frameW}, 2 @ ${results.frameH}\nGlass/Backing: ${results.glass}\nMat Window: ${results.win}\n\nORDERING:\nTotal Timber: ${results.total}\nRequired: ${results.sticks}`.trim();
-    navigator.clipboard.writeText(text).then(() => alert("Shopping list copied!"));
+    const text = `FRAME ORDER:\nCuts: 2@${document.getElementById("outFrmW").innerText}, 2@${document.getElementById("outFrmH").innerText}\nGlass: ${document.getElementById("glassResult").innerText}\nMat Window: ${document.getElementById("windowResult").innerText}`;
+    navigator.clipboard.writeText(text).then(() => alert("Copied!"));
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
-    if(confirm("Clear current inputs? (This won't delete saved projects)")) {
-        // Clear just the inputs, not the whole library
-        document.getElementById("projectName").value = "";
-        location.reload(); 
-    }
+    if(confirm("Reset current screen?")) { localStorage.removeItem(SESSION_KEY); location.reload(); }
 });
 
-// Modify onload to restore session
 window.onload = () => {
     updateProjectDropdown();
-    const lastSession = localStorage.getItem(SESSION_KEY);
-    if (lastSession) {
-        const data = JSON.parse(lastSession);
-        if (data.overlapMode) document.getElementById("overlapMode").value = data.overlapMode;
-        inputIds.forEach(id => {
-            if (data[id] !== undefined) document.getElementById(id).value = data[id];
-        });
+    const last = localStorage.getItem(SESSION_KEY);
+    if (last) {
+        const d = JSON.parse(last);
+        if (d.overlapMode) document.getElementById("overlapMode").value = d.overlapMode;
+        inputIds.forEach(id => { if (d[id] !== undefined) document.getElementById(id).value = d[id]; });
     }
-    updateOverlapUI();
-    calc();
+    updateOverlapUI(); calc();
 };
 </script>
 </body>
