@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Picture Frame Calculator</title>
+    <title>Picture Frame Calculator</title>
     <style>
         :root {
             --primary: #3498db;
@@ -85,11 +85,12 @@
                 <button id="syncCloudBtn" style="background: #3498db; color: white; flex: 1.2; white-space: nowrap; padding: 0 10px;">☁️ Sync Cloud</button>
             </div>
         </div>
+
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Load Saved</label>
             <div style="display: flex; gap: 5px;">
                 <select id="loadProjectSelect" style="flex: 1; min-width: 0;"><option value="">-- Load --</option></select>
-                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 45px; flex-shrink: 0; padding: 0;">✖</button>
+                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 45px; flex-shrink: 0; padding: 0;">Delete</button>
             </div>
         </div>
     </div>
@@ -104,7 +105,7 @@
             </select>
         </div>
         <div>
-            <label>Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board 'bites' the art.">i</span></label>
+            <label>Art/Mat Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board 'bites' the art. Use for 'floating' mounts'">i</span></label>
             <select id="overlapMode">
                 <option value="yes">Active Overlap</option>
                 <option value="no">Flush (No Overlap)</option>
@@ -131,7 +132,7 @@
     </div>
 
     <div style="margin-top:15px">
-        <label id="overlapLabel">Art Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm.">i</span></label>
+        <label id="overlapLabel">Art/Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm.">i</span></label>
         <input id="overlap" value="5">
     </div>
 
@@ -139,7 +140,7 @@
     <div class="triple-grid">
         <div><label>Face Width</label><input id="fmW" value="30"></div>
         <div><label>Timber Depth</label><input id="fmH" value="20"></div>
-        <div><label>Rebate Depth</label><input id="inset" value="10"></div>
+        <div><label>Rebate Depth</label><input id="inset" value="6"></div>
     </div>
     <div class="triple-grid">
         <div><label>Glass (mm)</label><input id="tGlass" value="3"></div>
@@ -147,12 +148,12 @@
         <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
     </div>
     <div class="grid">
-        <div><label>Clearance (mm)</label><input id="tolerance" value="2"></div>
+        <div><label>Tolerance (mm)</label><input id="tolerance" value="2"></div>
     </div>
 
     <h3>3. Material Stock & Ordering</h3>
     <div class="grid">
-        <div><label>Timber Length (mm)</label><input id="stickLen" value="2400"></div>
+        <div><label>Timber Length (mm)</label><input id="stickLen" value="1200"></div>
         <div><label>Waste Margin (%)</label><input id="wastePercent" value="10"></div>
     </div>
 
@@ -264,80 +265,111 @@ async function syncFromCloud() {
 }
 
 function calc() {
+    // 1. DATA COLLECTION
+    // Creates an object 'v' and fills it with values from all input IDs
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
         v[id] = el ? parseFloat(el.value) || 0 : 0;
     });
 
+    // Determine if we should subtract overlap from calculations
     const mode = document.getElementById("overlapMode").value;
-    if (v.picW <= 0 || v.picH <= 0) return;
-
+    if (v.picW <= 0 || v.picH <= 0) return; // Exit if dimensions aren't valid
     const over = mode === "no" ? 0 : v.overlap;
 
-    // 1. Mat Window Calculation
+    // 2. MAT WINDOW CALCULATION
+    // Calculates the actual hole cut into the mat board
     const winW = v.picW - (over * 2);
     const winH = v.picH - (over * 2);
 
-    // 2. Glass Size Calculation
-    // Total width = ArtWidth + LeftBorder + RightBorder - (2 * overlap) + tolerance
+    // 3. GLASS SIZE CALCULATION
+    // Glass must cover the Art + Borders + a small tolerance for movement
     const glassW = v.picW + v.matL + v.matR - (over * 2) + v.tolerance;
     const glassH = v.picH + v.matT + v.matB - (over * 2) + v.tolerance;
 
-    // 3. Timber Cut Calculation
+    // 4. TIMBER CUT CALCULATION
+    // Outer dimensions of the timber (mitre point to mitre point)
     const cutW = glassW + (2 * (v.fmW - v.inset));
     const cutH = glassH + (2 * (v.fmW - v.inset));
 
+    // 5. UPDATE RESULTS LABELS
     document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
     document.getElementById("glassResult").innerText = Math.round(glassW) + "x" + Math.round(glassH) + " mm";
     document.getElementById("outFrmW").innerText = Math.round(cutW) + " mm";
     document.getElementById("outFrmH").innerText = Math.round(cutH) + " mm";
 
+    // 6. TIMBER ORDERING LOGIC
+    // Calculates total linear length, adds waste, and determines number of sticks
     const netLinear = (cutW * 2) + (cutH * 2);
     const wasteMultiplier = 1 + (v.wastePercent / 100);
     const grossLinear = Math.round(netLinear * wasteMultiplier); 
     const sticksNeeded = Math.ceil(grossLinear / v.stickLen);
 
     document.getElementById("totalTimber").innerText = (grossLinear / 1000).toFixed(2) + " m";
-    document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm sticks`;
+    document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm lengths`;
 
-    // --- WORKSHOP PREVIEW ---
+    // 7. WORKSHOP PREVIEW (Main Front View)
+    // Scales the visual representation to fit the screen
     const fv = document.getElementById("frame-preview");
     const mv = document.getElementById("mat-preview");
     const pv = document.getElementById("pic-preview");
+    
+    // Resize the Frame, Mat, and Picture elements
     fv.style.width = (cutW * scale) + "px";
     fv.style.height = (cutH * scale) + "px";
     mv.style.width = (glassW * scale) + "px";
     mv.style.height = (glassH * scale) + "px";
+    
+    // Position the mat inside the frame rebate
     mv.style.left = mv.style.top = ((v.fmW - v.inset) * scale) + "px";
+    
+    // Resize and position the art relative to the mat borders
     pv.style.width = (v.picW * scale) + "px";
     pv.style.height = (v.picH * scale) + "px";
-    
-    // Positioning the art relative to the mat
-    // The gap from the edge of the glass to the art is (MatBorder - Overlap + HalfTolerance)
     pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
     pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
 
-    // --- STACK PREVIEW ---
+    // 8. STACK PREVIEW (Side Profile/Cross-Section)
     const stackTotal = v.tGlass + v.tMat + v.tBack;
     const remain = v.inset - stackTotal;
     const timber = document.getElementById("cs-timber");
     const stack = document.getElementById("cs-stack");
-    const tw = v.fmW * csScale;
-    const th = v.fmH * csScale;
+    
+    const tw = v.fmW * csScale; 
+    const th = v.fmH * csScale; 
     const rd = v.inset * csScale; 
 
+    // 1. Set Timber Dimensions & Clip-Path
     timber.style.width = tw + "px";
     timber.style.height = th + "px";
-    timber.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${(rd/th)*100}%, 60% ${(rd/th)*100}%, 60% 100%, 0% 100%)`;
+    // This creates the L-shape notch on the top right
+    timber.style.clipPath = `polygon(0% 0%, 60% 0%, 60% ${rd}px, 100% ${rd}px, 100% 100%, 0% 100%)`;
+    
+    // 2. Align the Material Stack
     stack.style.width = (tw * 0.4) + "px"; 
     stack.style.left = (tw * 0.6) + "px";
-    stack.style.bottom = (th - rd) + "px";
+    stack.style.top = "0px";  // Starts at the very top of the frame face
+    stack.style.height = "auto";
+    stack.style.background = "transparent"; // Fixes the "extra grey bar" issue
 
-    document.getElementById("vGlass").style.height = (v.tGlass * csScale) + "px";
-    document.getElementById("vMat").style.height = (v.tMat * csScale) + "px";
-    document.getElementById("vBack").style.height = (v.tBack * csScale) + "px";
+    // 3. Size the individual layers
+    const glassEl = document.getElementById("vGlass");
+    const matEl = document.getElementById("vMat");
+    const backEl = document.getElementById("vBack");
 
+    glassEl.style.height = (v.tGlass * csScale) + "px";
+    matEl.style.height = (v.tMat * csScale) + "px";
+    backEl.style.height = (v.tBack * csScale) + "px";
+
+    // 4. Position Check: If glass is protruding, it means the stack needs to 
+    // be pushed down to start at the bottom of the wood "lip".
+    // Usually, the glass sits UNDER the lip, so we push the stack down by rd:
+    stack.style.transform = `translateY(${rd}px)`; 
+    // Note: If you want the glass FLUSH with the top, use translateY(0)
+
+    // 9. UPDATE FIT STATUS
+    // Visual warning if the material stack is too thick for the frame
     const status = document.getElementById("fit-status");
     status.innerText = remain >= 0 ? `FIT: OK (${remain.toFixed(1)}mm left)` : `TOO THICK (${Math.abs(remain).toFixed(1)}mm overlap)`;
     status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
