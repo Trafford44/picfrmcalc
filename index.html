@@ -82,6 +82,7 @@
             <div style="display: flex; gap: 5px;">
                 <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 1;">
                 <button id="saveProjectBtn" style="background: #27ae60; color: white; width: 80px; padding: 0;">Save</button>
+                <button id="syncCloudBtn" style="background: #3498db; color: white; margin-top: 10px;">☁️ Sync to Cloud</button>
             </div>
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
@@ -210,6 +211,7 @@ const scale = 0.5;
 const csScale = 4;
 const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
+const G_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVibKx1YcE9ukHqtR6RqtPR4v2se91tOxj5BIUbWTbUtOr96_cr49dwgAnWr9d3RgV/exec";
 
 const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "inset", "tolerance", "tGlass", "tMat", "tBack", "stickLen", "wastePercent"];
 
@@ -242,6 +244,23 @@ function syncBorders() {
     // Trigger the calculation and auto-save after syncing
     calc(); 
     autoSaveCurrentState();
+}
+
+async function syncFromCloud() {
+    try {
+        const response = await fetch(G_SCRIPT_URL);
+        const cloudProjects = await response.json();
+        
+        // Merge cloud projects into LocalStorage so the app stays fast
+        const localLib = getLibrary();
+        const mergedLib = { ...localLib, ...cloudProjects };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedLib));
+        
+        updateProjectDropdown();
+        console.log("Cloud sync complete.");
+    } catch (err) {
+        console.error("Cloud fetch failed, using local data only.", err);
+    }
 }
 
 function calc() {
@@ -389,16 +408,59 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     if(confirm("Reset current screen?")) { localStorage.removeItem(SESSION_KEY); location.reload(); }
 });
 
-window.onload = () => {
+document.getElementById("syncCloudBtn").addEventListener("click", function() {
+    const name = document.getElementById("projectName").value.trim();
+    if (!name) return alert("Please enter a project name first.");
+
+    const btn = this;
+    btn.innerText = "Syncing...";
+    btn.disabled = true;
+
+    // Collect all current settings
+    const settings = {};
+    inputIds.forEach(id => settings[id] = document.getElementById(id).value);
+    settings.overlapMode = document.getElementById("overlapMode").value;
+
+    const googleWebAppUrl = "YOUR_GOOGLE_WEB_APP_URL_HERE";
+
+    fetch(googleWebAppUrl, {
+        method: "POST",
+        mode: "no-cors", // Required for cross-origin Google Script requests
+        cache: "no-cache",
+        body: JSON.stringify({
+            projectName: name,
+            settings: settings
+        })
+    })
+    .then(() => {
+        alert("Project synced to Google Sheets!");
+        btn.innerText = "☁️ Sync to Google Sheets";
+        btn.disabled = false;
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Sync failed. Check console.");
+        btn.disabled = false;
+    });
+});
+
+window.onload = async () => {
+    // 1. Initial UI setup from LocalStorage (fast)
     updateProjectDropdown();
-    const last = localStorage.getItem(SESSION_KEY);
-    if (last) {
-        const d = JSON.parse(last);
+    
+    const lastSession = localStorage.getItem(SESSION_KEY);
+    if (lastSession) {
+        const d = JSON.parse(lastSession);
         if (d.overlapMode) document.getElementById("overlapMode").value = d.overlapMode;
-        inputIds.forEach(id => { if (d[id] !== undefined) document.getElementById(id).value = d[id]; });
+        inputIds.forEach(id => { if (d[id]) document.getElementById(id).value = d[id]; });
     }
-    updateOverlapUI(); calc();
+    updateOverlapUI();
+    calc();
+
+    // 2. Fetch from Cloud in background (slower)
+    await syncFromCloud();
 };
+
 </script>
 </body>
 </html>
