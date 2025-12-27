@@ -76,20 +76,20 @@
     <h1>Picture Frame Calculator</h1>
     
     <h3>Projects</h3>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: end;">
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px; align-items: end; margin-bottom: 20px;">
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Project Name</label>
             <div style="display: flex; gap: 5px;">
-                <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 1;">
-                <button id="saveProjectBtn" style="background: #27ae60; color: white; width: 80px; padding: 0;">Save</button>
-                <button id="syncCloudBtn" style="background: #3498db; color: white; margin-top: 10px;">☁️ Sync to Cloud</button>
+                <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 2; min-width: 0;">
+                <button id="saveProjectBtn" style="background: #27ae60; color: white; flex: 1; white-space: nowrap; padding: 0 10px;">Save</button>
+                <button id="syncCloudBtn" style="background: #3498db; color: white; flex: 1.2; white-space: nowrap; padding: 0 10px;">☁️ Sync Cloud</button>
             </div>
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Load Saved</label>
             <div style="display: flex; gap: 5px;">
-                <select id="loadProjectSelect" style="flex: 1;"><option value="">-- Load Saved --</option></select>
-                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 50px; padding: 0;">Delete</button>
+                <select id="loadProjectSelect" style="flex: 1; min-width: 0;"><option value="">-- Load --</option></select>
+                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 45px; flex-shrink: 0; padding: 0;">✖</button>
             </div>
         </div>
     </div>
