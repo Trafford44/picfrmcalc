@@ -362,11 +362,11 @@ function calc() {
     matEl.style.height = (v.tMat * csScale) + "px";
     backEl.style.height = (v.tBack * csScale) + "px";
 
-    // 4. Position Check: If glass is protruding, it means the stack needs to 
-    // be pushed down to start at the bottom of the wood "lip".
-    // Usually, the glass sits UNDER the lip, so we push the stack down by rd:
-    stack.style.transform = `translateY(${rd}px)`; 
-    // Note: If you want the glass FLUSH with the top, use translateY(0)
+    // 4. Position Check
+    // We move the stack down by the rebate depth (rd), 
+    // then back UP by the total height of the materials (stackTotal * csScale)
+    const stackHeightPx = stackTotal * csScale;
+    stack.style.transform = `translateY(${rd - stackHeightPx}px)`;
 
     // 9. UPDATE FIT STATUS
     // Visual warning if the material stack is too thick for the frame
