@@ -44,6 +44,28 @@
         [data-tooltip]:before { content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #2c3e50; color: white; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: normal; line-height: 1.4; width: 200px; text-align: center; display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         [data-tooltip]:hover:before { display: block; }
 
+        /* Default: Mobile-first (One column stack) */
+        .project-header-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Tablet & Desktop: Switch to two columns */
+        @media (min-width: 600px) {
+            .project-header-grid {
+                display: grid;
+                grid-template-columns: 1.2fr 0.8fr;
+                align-items: end;
+            }
+        }
+
+        /* Fix for very small screens: Allow buttons to wrap if needed */
+        #projectName + button, #syncCloudBtn {
+            font-size: 14px; /* Slightly smaller text on mobile helps */
+        }
+
         .results-section { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
         .res-card { padding: 12px; border-radius: 8px; border-left: 5px solid var(--primary); background: #f8fbfe; }
         .res-card.timber { border-left-color: var(--timber-accent); background: #fffaf5; }
@@ -76,7 +98,7 @@
     <h1>Picture Frame Calculator</h1>
     
     <h3>Projects</h3>
-    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px; align-items: end; margin-bottom: 20px;">
+    <div class="project-header-grid">
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Project Name</label>
             <div style="display: flex; gap: 5px;">
