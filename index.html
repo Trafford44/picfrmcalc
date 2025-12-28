@@ -104,7 +104,7 @@
             <div style="display: flex; gap: 5px;">
                 <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 2; min-width: 0;">
                 <button id="saveProjectBtn" style="background: #27ae60; color: white; flex: 1; white-space: nowrap; padding: 0 10px;">Save</button>
-                <button id="syncCloudBtn" style="background: #3498db; color: white; flex: 1.2; white-space: nowrap; padding: 0 10px;">☁️ Sync Cloud</button>
+                <button id="syncCloudBtn" style="background: #3498db; color: white; flex: 1.2; white-space: nowrap; padding: 0 10px;">☁️ Sync</button>
             </div>
         </div>
 
@@ -488,7 +488,7 @@ document.getElementById("syncCloudBtn").addEventListener("click", function() {
     })
     .then(() => {
         alert("Project synced to Google Sheets!");
-        btn.innerText = "☁️ Sync to Cloud";
+        btn.innerText = "☁️ Sync";
         btn.disabled = false;
     })
     .catch(err => {
