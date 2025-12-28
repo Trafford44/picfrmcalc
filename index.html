@@ -62,8 +62,14 @@
         }
 
         /* Fix for very small screens: Allow buttons to wrap if needed */
-        #projectName + button, #syncCloudBtn {
+        #projectName + button, #saveProjectBtn {
             font-size: 14px; /* Slightly smaller text on mobile helps */
+        }
+
+        @media (max-width: 600px) {
+            #saveProjectBtn {
+                flex: 1.5 !important; /* Gives the 'Saved & Synced' text more room */
+            }
         }
 
         .results-section { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
@@ -104,7 +110,6 @@
             <div style="display: flex; gap: 5px;">
                 <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 2; min-width: 0;">
                 <button id="saveProjectBtn" style="background: #27ae60; color: white; flex: 1; white-space: nowrap; padding: 0 10px;">Save</button>
-                <button id="syncCloudBtn" style="background: #3498db; color: white; flex: 1.2; white-space: nowrap; padding: 0 10px;">☁️ Sync</button>
             </div>
         </div>
 
@@ -411,16 +416,53 @@ document.querySelectorAll("input, select").forEach(el => {
     });
 });
 
-document.getElementById("saveProjectBtn").addEventListener("click", () => {
+document.getElementById("saveProjectBtn").addEventListener("click", async function() {
     const name = document.getElementById("projectName").value.trim();
     if (!name) return alert("Enter project name.");
+
+    // 1. LOCAL SAVE
     const lib = getLibrary();
-    const data = { overlapMode: document.getElementById("overlapMode").value };
-    inputIds.forEach(id => data[id] = document.getElementById(id).value);
-    lib[name] = data;
+    const settings = { overlapMode: document.getElementById("overlapMode").value };
+    inputIds.forEach(id => settings[id] = document.getElementById(id).value);
+    
+    lib[name] = settings;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
     updateProjectDropdown();
-    alert("Project saved.");
+
+    // 2. CLOUD SYNC (Visual Feedback)
+    const btn = this;
+    const originalText = "Save";
+    const originalBG = btn.style.background;
+
+    try {
+        btn.innerText = "Syncing...";
+        btn.disabled = true;
+
+        await fetch(G_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", 
+            cache: "no-cache",
+            body: JSON.stringify({
+                projectName: name,
+                settings: settings
+            })
+        });
+
+        // Success State
+        btn.innerText = "Saved & Synced!";
+        btn.style.background = "#2ecc71"; // Change to success green
+    } catch (err) {
+        console.error(err);
+        btn.innerText = "Local Saved (Sync Error)";
+        btn.style.background = "#e67e22"; // Change to warning orange
+    } finally {
+        // Revert button after 3 seconds
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = originalBG;
+            btn.disabled = false;
+        }, 3000);
+    }
 });
 
 document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
@@ -462,41 +504,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     if(confirm("Reset current screen?")) { localStorage.removeItem(SESSION_KEY); location.reload(); }
 });
 
-document.getElementById("syncCloudBtn").addEventListener("click", function() {
-    const name = document.getElementById("projectName").value.trim();
-    if (!name) return alert("Please enter a project name first.");
 
-    const btn = this;
-    btn.innerText = "Syncing...";
-    btn.disabled = true;
-
-    // Collect all current settings
-    const settings = {};
-    inputIds.forEach(id => settings[id] = document.getElementById(id).value);
-    settings.overlapMode = document.getElementById("overlapMode").value;
-
-    const googleWebAppUrl = G_SCRIPT_URL;
-
-    fetch(googleWebAppUrl, {
-        method: "POST",
-        mode: "no-cors", // Required for cross-origin Google Script requests
-        cache: "no-cache",
-        body: JSON.stringify({
-            projectName: name,
-            settings: settings
-        })
-    })
-    .then(() => {
-        alert("Project synced to Google Sheets!");
-        btn.innerText = "☁️ Sync";
-        btn.disabled = false;
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Sync failed. Check console.");
-        btn.disabled = false;
-    });
-});
 
 window.onload = async () => {
     // 1. Initial UI setup from LocalStorage (fast)
