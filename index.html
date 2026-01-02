@@ -96,13 +96,81 @@
         .cs-layer { width: 100%; border: 1px solid rgba(0,0,0,0.1); box-sizing: border-box; }
         .cs-axis { position: absolute; font-size: 9px; font-weight: bold; color: #666; }
         #fit-status { font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+        .calc-method-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        .method-toggle {
+            width: 100%;
+            padding: 12px 15px;
+            background: #e9ecef;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .method-toggle:hover {
+            background: #dee2e6;
+        }
+
+        .method-content {
+            display: none; /* Hidden by default */
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .method-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .example-box {
+            background-color: #f0f7ff;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+            border-left: 4px solid #007bff;
+            color: #2c3e50;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>Picture Frame Calculator</h1>
-    
+    <h1>Picture Frame Calculator <span class="info-icon" data-tooltip="Calculation Method: 'Art + Margin'. Mat widths are measured from the edge of the picture to the frame rebate. Note: The actual visible mat will include the overlap.">i</span></h1>
+    <div class="calc-method-box">
+        <button class="method-toggle" onclick="toggleDetails()">
+            <span>ℹ️ Calculation Method: <strong>Art + Margin</strong></span>
+            <span id="arrow">▼</span>
+        </button>
+        <div id="method-details" class="method-content">
+            <p>This calculator uses the traditional <strong>Art + Margin</strong> industry standard:</p>
+            <ul>
+                <li><strong>Mat Measurements:</strong> Calculated from the edge of your picture to the frame rebate inner edge.</li>
+                <li><strong>Overlap:</strong> To ensure the art is held securely, the mat hole is cut slightly smaller than the picture.</li>
+                <li><strong>Note:</strong> Because the margin starts at the art edge, the <em>visible</em> mat will be your margin plus the overlap.</li>
+            </ul>
+        <div class="example-box">
+            <strong>Example Calculation:</strong><br>
+            Art: 200mm | Margin: 50mm | Overlap: 5mm<br>
+            • <strong>Glass/Mat Size:</strong> 300mm (200 + 50 + 50)<br>
+            • <strong>Mat Window:</strong> 190mm (200 - 5 - 5)<br>
+            • <strong>Visible Mat:</strong> 55mm (50 + 5)
+        </div>
+        </div>
+    </div>    
     <h3>Projects</h3>
     <div class="project-header-grid">
         <div style="display: flex; flex-direction: column; gap: 5px;">
@@ -149,7 +217,7 @@
     <label>
         Mat Border Widths (mm) 
         <button onclick="syncBorders()" style="display: inline-block; margin-left: 10px; padding: 2px 8px; font-size: 10px; height: 22px; width: auto; background: #95a5a6; color: white; vertical-align: middle;">🔗 Sync All</button>
-        <span class="info-icon" data-tooltip="Width of the mat board on each side.">i</span>
+        <span class="info-icon" data-tooltip="Width of the mat board on each side, from picture edge.">i</span>
     </label>
     <div class="quad-grid">
         <div><label style="font-size:10px">Top</label><input id="matT" value="50"></div>
@@ -159,7 +227,7 @@
     </div>
 
     <div style="margin-top:15px">
-        <label id="overlapLabel">Art/Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm.">i</span></label>
+        <label id="overlapLabel">Art/Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm. This will dictate the mat hole size">i</span></label>
         <input id="overlap" value="5">
     </div>
 
@@ -185,10 +253,10 @@
     </div>
 
     <div class="results-section">
-        <div class="res-card"><label style="font-size:0.6rem">MAT WINDOW</label><span class="val" id="windowResult">—</span></div>
-        <div class="res-card"><label style="font-size:0.6rem">GLASS SIZE</label><span class="val" id="glassResult">—</span></div>
-        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER WIDTH</label><span class="val" id="outFrmW">—</span></div>
-        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER HEIGHT</label><span class="val" id="outFrmH">—</span></div>
+        <div class="res-card"><label style="font-size:0.6rem">MAT WINDOW <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="windowResult">—</span></div>
+        <div class="res-card"><label style="font-size:0.6rem">GLASS & MAT SIZE <span class="info-icon" data-tooltip="Picture plus mat (including rebate)">i</span></label><span class="val" id="glassResult">—</span></div>
+        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER WIDTH <span class="info-icon" data-tooltip="Outer dimensions of the timber (mitre point to mitre point), including tolerance">i</span></label><span class="val" id="outFrmW">—</span></div>
+        <div class="res-card timber"><label style="font-size:0.6rem">TIMBER HEIGHT <span class="info-icon" data-tooltip="Outer dimensions of the timber (mitre point to mitre point), including tolerance">i</span></label><span class="val" id="outFrmH">—</span></div>
         <div class="res-card timber" style="border-left-color: #27ae60; background: #f0fff4;">
             <label style="font-size:0.6rem">ORDERING TOTAL</label>
             <span class="val" id="totalTimber">—</span>
@@ -199,7 +267,7 @@
     <div class="btn-group">
         <button id="resetBtn">Reset</button>
         <button id="copyBtn">Copy Dimensions</button>
-    </div>
+    </div>descrepancy
 
     <div class="preview-layout">
         <div class="preview-box">
@@ -291,6 +359,19 @@ async function syncFromCloud() {
     }
 }
 
+function toggleDetails() {
+    const content = document.getElementById('method-details');
+    const arrow = document.getElementById('arrow');
+    
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        arrow.textContent = '▼';
+    } else {
+        content.style.display = 'block';
+        arrow.textContent = '▲';
+    }
+}
+
 function calc() {
     // 1. DATA COLLECTION
     // Creates an object 'v' and fills it with values from all input IDs
@@ -306,19 +387,19 @@ function calc() {
     const over = mode === "no" ? 0 : v.overlap;
 
     // 2. MAT WINDOW CALCULATION
-    // Calculates the actual hole cut into the mat board
+    // Calculates the actual hole cut into the mat board (the "starting point" for the visible mat)
     const winW = v.picW - (over * 2);
     const winH = v.picH - (over * 2);
 
     // 3. GLASS SIZE CALCULATION
-    // Glass must cover the Art + Borders + a small tolerance for movement
-    const glassW = v.picW + v.matL + v.matR - (over * 2) + v.tolerance;
-    const glassH = v.picH + v.matT + v.matB - (over * 2) + v.tolerance;
+    // Glass must cover the Art + Borders
+    const glassW = v.picW + v.matL + v.matR;
+    const glassH = v.picH + v.matT + v.matB;
 
     // 4. TIMBER CUT CALCULATION
-    // Outer dimensions of the timber (mitre point to mitre point)
-    const cutW = glassW + (2 * (v.fmW - v.inset));
-    const cutH = glassH + (2 * (v.fmW - v.inset));
+    // Outer dimensions of the timber (mitre point to mitre point) + a small tolerance for movement
+    const cutW = glassW + (2 * (v.fmW - v.inset)) + v.tolerance;
+    const cutH = glassH + (2 * (v.fmW - v.inset)) + v.tolerance;
 
     // 5. UPDATE RESULTS LABELS
     document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
