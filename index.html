@@ -9,7 +9,9 @@
             --primary: #3498db;
             --timber: #5d4037;
             --timber-accent: #e67e22;
-            --mat: #9b59b6;
+            --mat: #9b59b6; /* This is the purple UI accent */
+            --mat-bg: #ffffff; /* The actual color of the mat board in preview */
+            --spacer: #cbd5e0; /* A distinct cool slate grey */
             --glass: rgba(173, 216, 230, 0.7);
             --backing: #d2b48c;
             --bg: #f4f7f6;
@@ -244,18 +246,29 @@
     <div class="triple-grid">
         <div><label>Face Width</label><input id="fmW" value="30"></div>
         <div><label>Timber Depth</label><input id="fmH" value="20"></div>
-        <div><label>Rebate Width</label><input id="rebateWidth" value="6"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+            <div><label>Rebate W <span class="info-icon" data-tooltip="Standard width is 6mm.">i</span></label><input id="rebateWidth" value="6"></div>
+            <div><label>Rebate D <span class="info-icon" data-tooltip="Standard depth is 12mm.">i</span></label><input id="rebateDepth" value="12"></div>
+        </div>
     </div>
     <div class="triple-grid">
         <div><label>Glass (mm)</label><input id="tGlass" value="3"></div>
+        <div><label>Spacer (mm) <span class="info-icon" data-tooltip="Depth of foam/plastic spacer for 'floating' look.">i</span></label><input id="tSpacer" value="0"></div>
         <div><label>Mat (mm)</label><input id="tMat" value="1.5"></div>
-        <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
     </div>
-    <div class="grid">
-        <div><label>Tolerance (mm)</label><input id="tolerance" value="2"></div>
+    <div class="triple-grid">
+        <div><label>Backing (mm)</label><input id="tBack" value="3"></div>
+        <div><label>Tolerance (mm) <span class="info-icon" data-tooltip="Standard tolerance is 2 or 3mm.">i</span></label><input id="tolerance" value="2"></div>
     </div>
 
-    <h3>3. Material Stock & Ordering</h3>
+    <h3>3. Other detail</h3>
+    <div style="margin-top: 20px;">
+        <label>Project Notes <span class="info-icon" data-tooltip="Internal notes for the workshop, saved with the project.">i</span></label>
+        <textarea id="projectNotes" rows="3" placeholder="e.g. Acid-free tape required, double-check rebate fit..." 
+            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box;"></textarea>
+    </div>
+
+    <h3>4. Material Stock & Ordering</h3>
     <div class="grid">
         <div><label>Timber Length (mm)</label><input id="stickLen" value="1200"></div>
         <div><label>Waste Margin (%)</label><input id="wastePercent" value="10"></div>
@@ -298,7 +311,8 @@
             <div class="legend">
                 <div class="legend-item"><div class="swatch" style="background:var(--timber)"></div>Timber</div>
                 <div class="legend-item"><div class="swatch" style="background:var(--glass)"></div>Glass</div>
-                <div class="legend-item"><div class="swatch" style="background:#fff"></div>Mat</div>
+                <div class="legend-item"><div class="swatch" style="background:var(--spacer); border: 1px dashed #ccc;"></div>Spacer</div>
+                <div class="legend-item"><div class="swatch" style="background:var(--mat-bg)"></div>Mat</div>
                 <div class="legend-item"><div class="swatch" style="background:var(--backing)"></div>Backing</div>
             </div>
             <div class="cs-container">
@@ -306,6 +320,7 @@
                 <div class="cs-stack" id="cs-stack">
                     <div class="cs-layer" id="vBack" style="background:var(--backing)"></div>
                     <div class="cs-layer" id="vMat" style="background:#fff"></div>
+                    <div class="cs-layer" id="vSpacer" style="background:rgba(0,0,0,0.05); border: 1px dashed #ccc;"></div>
                     <div class="cs-layer" id="vGlass" style="background:var(--glass)"></div>
                 </div>
                 <div class="cs-axis" style="bottom: -18px; width: 60%; text-align: center;">FACE</div>
@@ -322,7 +337,7 @@ const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
 const G_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxChg_RdktgR6CGRYsel5Z8rs9ZbJyj3mR6tm16Ng_drJc1tnuDt9s8VSJU1okovorb/exec";
 
-const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "rebateWidth", "tolerance", "tGlass", "tMat", "tBack", "stickLen", "wastePercent"];
+const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", "tBack", "stickLen", "wastePercent", "projectNotes"];
 
 function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
 
@@ -458,48 +473,59 @@ function calc() {
     pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
 
     // 8. STACK PREVIEW (Side Profile/Cross-Section)
-    const stackTotal = v.tGlass + v.tMat + v.tBack;
-    const remain = v.rebateWidth - stackTotal;
+    const stackTotal = v.tGlass + v.tSpacer + v.tMat + v.tBack;
+    const remain = v.rebateDepth - stackTotal; 
+    
     const timber = document.getElementById("cs-timber");
     const stack = document.getElementById("cs-stack");
+    const depthInput = document.getElementById("rebateDepth");
     
+    // Scale factors for the preview
     const tw = v.fmW * csScale; 
     const th = v.fmH * csScale; 
-    const rd = v.rebateWidth * csScale; 
+    const rw = v.rebateWidth * csScale; 
+    const rd = v.rebateDepth * csScale; 
 
     // 1. Set Timber Dimensions & Clip-Path
+    // We calculate the 'notch' position based on the face width minus rebate width
     timber.style.width = tw + "px";
     timber.style.height = th + "px";
-    // This creates the L-shape notch on the top right
-    timber.style.clipPath = `polygon(0% 0%, 60% 0%, 60% ${rd}px, 100% ${rd}px, 100% 100%, 0% 100%)`;
     
-    // 2. Align the Material Stack
-    stack.style.width = (tw * 0.4) + "px"; 
-    stack.style.left = (tw * 0.6) + "px";
-    stack.style.top = "0px";  // Starts at the very top of the frame face
-    stack.style.height = "auto";
-    stack.style.background = "transparent"; // Fixes the "extra grey bar" issue
-
+    const faceEdgePx = tw - rw; 
+    const faceEdgePercent = (faceEdgePx / tw) * 100;
+    
+    // Clip-Path: Bottom-Left -> Top-Left -> Notch-Start -> Notch-Bottom -> Bottom-Right
+    timber.style.clipPath = `polygon(0% 100%, 0% 0%, ${faceEdgePercent}% 0%, ${faceEdgePercent}% ${rd}px, 100% ${rd}px, 100% 100%)`;
+    
+    // 2. Align the Material Stack in the rebate
+    stack.style.width = rw + "px"; 
+    stack.style.left = faceEdgePx + "px";
+    stack.style.top = "0px"; 
+    
     // 3. Size the individual layers
-    const glassEl = document.getElementById("vGlass");
-    const matEl = document.getElementById("vMat");
-    const backEl = document.getElementById("vBack");
+    document.getElementById("vGlass").style.height = (v.tGlass * csScale) + "px";
+    document.getElementById("vSpacer").style.height = (v.tSpacer * csScale) + "px"; // Size the gap
+    document.getElementById("vMat").style.height = (v.tMat * csScale) + "px";
+    document.getElementById("vBack").style.height = (v.tBack * csScale) + "px";
 
-    glassEl.style.height = (v.tGlass * csScale) + "px";
-    matEl.style.height = (v.tMat * csScale) + "px";
-    backEl.style.height = (v.tBack * csScale) + "px";
-
-    // 4. Position Check
-    // We move the stack down by the rebate depth (rd), 
-    // then back UP by the total height of the materials (stackTotal * csScale)
+    // 4. Position the stack so it sits on the "bottom" of the rebate
     const stackHeightPx = stackTotal * csScale;
     stack.style.transform = `translateY(${rd - stackHeightPx}px)`;
 
-    // 9. UPDATE FIT STATUS
-    // Visual warning if the material stack is too thick for the frame
+    // 9. UPDATE FIT STATUS & VISUAL WARNING
     const status = document.getElementById("fit-status");
-    status.innerText = remain >= 0 ? `FIT: OK (${remain.toFixed(1)}mm left)` : `TOO THICK (${Math.abs(remain).toFixed(1)}mm overlap)`;
-    status.style.color = remain >= 0 ? "#27ae60" : "#e74c3c";
+    if (remain >= 0) {
+        status.innerText = `FIT: OK (${remain.toFixed(1)}mm left)`;
+        status.style.color = "#27ae60";
+        depthInput.style.borderColor = "#ddd";
+        depthInput.style.backgroundColor = "#fff";
+    } else {
+        status.innerText = `TOO THICK (${Math.abs(remain).toFixed(1)}mm overflow)`;
+        status.style.color = "#e74c3c";
+        // Visual warning on the input field
+        depthInput.style.borderColor = "#e74c3c";
+        depthInput.style.backgroundColor = "#fff5f5";
+    }
 }
 
 function autoSaveCurrentState() {
@@ -508,7 +534,8 @@ function autoSaveCurrentState() {
     localStorage.setItem(SESSION_KEY, JSON.stringify(data));
 }
 
-document.querySelectorAll("input, select").forEach(el => {
+// Existing listener loop handles this:
+document.querySelectorAll("input, select, textarea").forEach(el => {
     el.addEventListener("input", () => {
         if (el.id === "overlapMode") updateOverlapUI();
         calc();
@@ -596,12 +623,53 @@ document.getElementById("presetSelect").addEventListener("change", (e) => {
 });
 
 document.getElementById("copyBtn").addEventListener("click", () => {
-    const text = `FRAME ORDER:
-Cuts: 2@${document.getElementById("outFrmW").innerText}, 2@${document.getElementById("outFrmH").innerText}
-Glass: ${document.getElementById("glassResult").innerText}
-Mat Window: ${document.getElementById("windowResult").innerText}
-Mat Hole Start: ${document.getElementById("matHoleStartResult").innerText}`;
-    navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+    const v = {};
+    // Collect all current values from inputs
+    inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        v[id] = el ? el.value : "";
+    });
+
+    const mode = document.getElementById("overlapMode").value;
+    const notes = document.getElementById("projectNotes").value;
+    const project = document.getElementById("projectName").value || "Unnamed Project";
+
+    const text = `--- FRAME PROJECT: ${project.toUpperCase()} ---
+
+PRODUCTION CUTS:
+• Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
+• Glass/Mat: ${document.getElementById("glassResult").innerText}
+• Mat Window: ${document.getElementById("windowResult").innerText}
+• Mat Hole Start: ${document.getElementById("matHoleStartResult").innerText}
+
+MATERIAL STACK:
+• Glass: ${v.tGlass}mm | Spacer: ${v.tSpacer}mm
+• Mat: ${v.tMat}mm | Backing: ${v.tBack}mm
+• Total Order: ${document.getElementById("totalTimber").innerText} (${document.getElementById("stickCount").innerText})
+
+TECHNICAL SETTINGS:
+• Art Size: ${v.picW}x${v.picH}mm
+• Borders (T/B/L/R): ${v.matT}/${v.matB}/${v.matL}/${v.matR}mm
+• Overlap: ${mode === 'yes' ? v.overlap + 'mm' : 'None'}
+• Timber Profile: ${v.fmW}mm Face / ${v.fmH}mm Depth
+• Rebate: ${v.rebateWidth}mm Wide / ${v.rebateDepth}mm Deep
+• Tolerance: ${v.tolerance}mm
+
+NOTES:
+${notes || 'No notes provided'}
+-------------------------------------------`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        // Visual feedback on the button
+        const btn = document.getElementById("copyBtn");
+        const originalText = btn.innerText;
+        btn.innerText = "✓ Copied All Settings";
+        btn.style.background = "#27ae60";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+        }, 2000);
+    });
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
