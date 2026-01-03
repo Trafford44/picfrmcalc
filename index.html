@@ -158,17 +158,26 @@
         <div id="method-details" class="method-content">
             <p>This calculator uses the traditional <strong>Art + Margin</strong> industry standard:</p>
             <ul>
-                <li><strong>Mat Measurements:</strong> Calculated from the edge of your picture to the frame rebate inner edge.</li>
-                <li><strong>Overlap:</strong> To ensure the art is held securely, the mat hole is cut slightly smaller than the picture.</li>
-                <li><strong>Note:</strong> Because the margin starts at the art edge, the <em>visible</em> mat will be your margin plus the overlap.</li>
+                <li><strong>Mat Measurements:</strong> Calculated from the edge of your picture to the frame rebate.</li>
+                <li><strong>Overlap:</strong> The hole is cut smaller than the picture to secure the art.</li>
             </ul>
-        <div class="example-box">
-            <strong>Example Calculation:</strong><br>
-            Art: 200mm | Margin: 50mm | Overlap: 5mm<br>
-            • <strong>Glass/Mat Size:</strong> 300mm (200 + 50 + 50)<br>
-            • <strong>Mat Window:</strong> 190mm (200 - 5 - 5)<br>
-            • <strong>Visible Mat:</strong> 55mm (50 + 5)
-        </div>
+            
+            <div class="example-box">
+                <strong>Mat Cutter's Cheat Sheet (Metric):</strong><br>
+                To cut the window, set your mat-cutter guides to the <strong>Mat Hole Start</strong> values:
+                <ul style="margin-top: 5px; list-style-type: '→ ';">
+                    <li><strong>Start X (Left):</strong> Margin Left + Overlap</li>
+                    <li><strong>Start Y (Top):</strong> Margin Top + Overlap</li>
+                </ul>
+                <small><em>This ensures your "Visible Mat" is exactly what you expect after the overlap is applied.</em></small>
+            </div>
+
+            <div class="example-box" style="background-color: #f8f9fa; border-left-color: #6c757d;">
+                <strong>Example:</strong> Art 200mm | Margin 50mm | Overlap 5mm<br>
+                • Glass Size: <strong>300mm</strong><br>
+                • Window Size: <strong>190mm</strong><br>
+                • Cutter Guide Setting: <strong>55mm</strong>
+            </div>
         </div>
     </div>    
     <h3>Projects</h3>
@@ -195,8 +204,8 @@
             <label>Presets <span class="info-icon" data-tooltip="Common frame setups.">i</span></label>
             <select id="presetSelect">
                 <option value="">-- Choose a Size --</option>
-                <option value="210|297|50|50|50|50|5">A4 (50mm Borders)</option>
-                <option value="297|420|60|80|60|60|5">A3 (Weighted Bottom)</option>
+                <option value="210|297|50|50|50|50|5">A4 (210x297. 50mm Borders)</option>
+                <option value="297|420|60|80|60|60|5">A3 (297x420. Weighted Bottom)</option>
             </select>
         </div>
         <div>
@@ -254,6 +263,10 @@
 
     <div class="results-section">
         <div class="res-card"><label style="font-size:0.6rem">MAT WINDOW <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="windowResult">—</span></div>
+        <div class="res-card" style="border-left-color: var(--mat); background: #faf5ff;">
+            <label style="font-size:0.6rem">MAT HOLE START (X/Y) <span class="info-icon" data-tooltip="Measurement from top-left of mat board to the start of the window cut.">i</span></label>
+            <span class="val" id="matHoleStartResult">—</span>
+        </div>
         <div class="res-card"><label style="font-size:0.6rem">GLASS & MAT SIZE <span class="info-icon" data-tooltip="Picture plus mat (including rebate)">i</span></label><span class="val" id="glassResult">—</span></div>
         <div class="res-card timber"><label style="font-size:0.6rem">TIMBER WIDTH <span class="info-icon" data-tooltip="Outer dimensions of the timber (mitre point to mitre point), including tolerance">i</span></label><span class="val" id="outFrmW">—</span></div>
         <div class="res-card timber"><label style="font-size:0.6rem">TIMBER HEIGHT <span class="info-icon" data-tooltip="Outer dimensions of the timber (mitre point to mitre point), including tolerance">i</span></label><span class="val" id="outFrmH">—</span></div>
@@ -391,6 +404,11 @@ function calc() {
     const winW = v.picW - (over * 2);
     const winH = v.picH - (over * 2);
 
+    // MAT HOLE START COORDINATES
+    // Calculated from outer mat edge to the start of the hole
+    const matHoleStartX = v.matL + over;
+    const matHoleStartY = v.matT + over;
+
     // 3. GLASS SIZE CALCULATION
     // Glass must cover the Art + Borders
     const glassW = v.picW + v.matL + v.matR;
@@ -404,6 +422,7 @@ function calc() {
     // 5. UPDATE RESULTS LABELS
     document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
     document.getElementById("glassResult").innerText = Math.round(glassW) + "x" + Math.round(glassH) + " mm";
+    document.getElementById("matHoleStartResult").innerText = `L: ${Math.round(matHoleStartX)} | T: ${Math.round(matHoleStartY)} mm`;
     document.getElementById("outFrmW").innerText = Math.round(cutW) + " mm";
     document.getElementById("outFrmH").innerText = Math.round(cutH) + " mm";
 
@@ -577,7 +596,11 @@ document.getElementById("presetSelect").addEventListener("change", (e) => {
 });
 
 document.getElementById("copyBtn").addEventListener("click", () => {
-    const text = `FRAME ORDER:\nCuts: 2@${document.getElementById("outFrmW").innerText}, 2@${document.getElementById("outFrmH").innerText}\nGlass: ${document.getElementById("glassResult").innerText}\nMat Window: ${document.getElementById("windowResult").innerText}`;
+    const text = `FRAME ORDER:
+Cuts: 2@${document.getElementById("outFrmW").innerText}, 2@${document.getElementById("outFrmH").innerText}
+Glass: ${document.getElementById("glassResult").innerText}
+Mat Window: ${document.getElementById("windowResult").innerText}
+Mat Hole Start: ${document.getElementById("matHoleStartResult").innerText}`;
     navigator.clipboard.writeText(text).then(() => alert("Copied!"));
 });
 
