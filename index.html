@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Picture Frame Calculator</title>
+    <title>Picture Frame Job Buddy</title>
     <style>
         :root {
             --primary: #3498db;
@@ -47,7 +47,7 @@
         [data-tooltip]:hover:before { display: block; }
 
         /* Default: Mobile-first (One column stack) */
-        .project-header-grid {
+        .job-header-grid {
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -56,7 +56,7 @@
 
         /* Tablet & Desktop: Switch to two columns */
         @media (min-width: 600px) {
-            .project-header-grid {
+            .job-header-grid {
                 display: grid;
                 grid-template-columns: 1.2fr 0.8fr;
                 align-items: end;
@@ -64,12 +64,12 @@
         }
 
         /* Fix for very small screens: Allow buttons to wrap if needed */
-        #projectName + button, #saveProjectBtn {
+        #jobName + button, #saveJobBtn {
             font-size: 14px; /* Slightly smaller text on mobile helps */
         }
 
         @media (max-width: 600px) {
-            #saveProjectBtn {
+            #saveJobBtn {
                 flex: 1.5 !important; /* Gives the 'Saved & Synced' text more room */
             }
         }
@@ -151,7 +151,7 @@
 <body>
 
 <div class="card">
-    <h1>Picture Frame Calculator <span class="info-icon" data-tooltip="Calculation Method: 'Art + Margin'. Mat widths are measured from the edge of the picture to the frame rebate. Note: The actual visible mat will include the overlap.">i</span></h1>
+    <h1>Picture Frame Job Buddy</h1>
     <div class="calc-method-box">
         <button class="method-toggle" onclick="toggleDetails()">
             <span>ℹ️ Calculation Method: <strong>Art + Margin</strong></span>
@@ -160,13 +160,13 @@
         <div id="method-details" class="method-content">
             <p>This calculator uses the traditional <strong>Art + Margin</strong> industry standard:</p>
             <ul>
-                <li><strong>Mat Measurements:</strong> Calculated from the edge of your picture to the frame rebate.</li>
-                <li><strong>Overlap:</strong> The hole is cut smaller than the picture to secure the art.</li>
+                <li><strong>Mat Border Measurement:</strong> Calculated from the edge of your picture to the frame rebate internal edge i.e. This is not inclusive of the mat/picture overlap</li>
+                <li><strong>Overlap:</strong> This is the mat/picture overlap. This doesn't impact the size of the frame, only what is visible of the picture.  It is not included in the Mat Border measurement</li>
             </ul>
             
             <div class="example-box">
-                <strong>Mat Cutter's Cheat Sheet (Metric):</strong><br>
-                To cut the window, set your mat-cutter guides to the <strong>Mat Hole Start</strong> values:
+                <strong>Mat Cutter's Cheat Sheet:</strong><br>
+                To cut the opening, set your mat-cutter guides to the <strong>Mat Opening Start</strong> values, calculated below.  The calculations are:
                 <ul style="margin-top: 5px; list-style-type: '→ ';">
                     <li><strong>Start X (Left):</strong> Margin Left + Overlap</li>
                     <li><strong>Start Y (Top):</strong> Margin Top + Overlap</li>
@@ -177,19 +177,19 @@
             <div class="example-box" style="background-color: #f8f9fa; border-left-color: #6c757d;">
                 <strong>Example:</strong> Art 200mm | Margin 50mm | Overlap 5mm<br>
                 • Glass Size: <strong>300mm</strong><br>
-                • Window Size: <strong>190mm</strong><br>
+                • Opening Size: <strong>190mm</strong><br>
                 • Cutter Guide Setting: <strong>55mm</strong>
             </div>
         </div>
     </div>    
-    <h3>Projects</h3>
-    <div class="project-header-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+    <h3>Jobs</h3>
+    <div class="job-header-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
         
         <div style="display: flex; flex-direction: column; gap: 5px;">
-            <label>Project Name</label>
+            <label>Job Name</label>
             <div style="display: flex; gap: 8px;">
-                <input id="projectName" placeholder="e.g. Living Room Set" style="flex: 1; margin: 0; height: 40px;">
-                <button id="saveProjectBtn" style="background: #27ae60; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Save</button>
+                <input id="jobName" placeholder="e.g. Living Room Set" style="flex: 1; margin: 0; height: 40px;">
+                <button id="saveJobBtn" style="background: #27ae60; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Save</button>
             </div>
             <div id="cloudStatus" style="font-size: 10px; color: #e67e22; font-weight: bold; min-height: 15px; margin-top: 2px;">
                 ● Unsaved Changes (Click Save to Sync)
@@ -199,26 +199,47 @@
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label style="display: flex; justify-content: space-between; align-items: center;">
                 Load Saved 
-                <span id="projectCountBadge" style="background: #bdc3c7; color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: bold;">0</span>
+                <span id="jobCountBadge" style="background: #bdc3c7; color: white; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: bold;">0</span>
             </label>
             <div style="display: flex; gap: 8px;">
-                <select id="loadProjectSelect" style="flex: 1; margin: 0; height: 40px;">
+                <select id="loadJobSelect" style="flex: 1; margin: 0; height: 40px;">
                     <option value="">-- Load Saved --</option>
                 </select>
-                <button id="deleteProjectBtn" style="background: #e74c3c; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Delete</button>
+                <button id="deleteJobBtn" style="background: #e74c3c; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Delete</button>
             </div>
         </div>
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <label>About Project<span class="info-icon" data-tooltip="General project description. Saved with the project.">i</span></label>
-        <textarea id="projectAbout" 
-            rows="1" 
-            oninput="autoExpand(this)" 
-            placeholder="e.g. Framing of print for ..." 
-            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;">
-        </textarea>
+
+    <h3 style="margin-top: 20px;">1. Job Background</h3>
+
+    <div class="grid">
+        <div>
+            <label>About Job<span class="info-icon" data-tooltip="General job description.">i</span></label>
+            <textarea id="jobAbout" rows="1" oninput="autoExpand(this)" placeholder="e.g. Framing of print for..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;"></textarea>
+        </div>
+        <div>
+            <label>Reference URL <span class="info-icon" data-tooltip="Link to artist website, portfolio, or source image etc.">i</span></label>
+            <input type="url" id="jobUrl" placeholder="https://artist-site.com/work" style="width: 100%;">
+        </div>
     </div>
+
+    <div class="triple-grid">
+        <div>
+            <label>Artist <span class="info-icon" data-tooltip="Name of the creator.">i</span></label>
+            <input type="text" id="artArtist" placeholder="Artist Name">
+        </div>
+        <div>
+            <label>Year <span class="info-icon" data-tooltip="Year of creation.">i</span></label>
+            <input type="text" id="artYear" placeholder="YYYY">
+        </div>
+        <div>
+            <label>Medium <span class="info-icon" data-tooltip="e.g. Giclée Print, Oil, Watercolor.">i</span></label>
+            <input type="text" id="artMedium" placeholder="e.g. Oil on Canvas">
+        </div>
+    </div>
+
+    <h3>2. Artwork & Matting</h3>
     <div class="grid">
         <div>
             <label>Presets <span class="info-icon" data-tooltip="Common frame setups.">i</span></label>
@@ -237,7 +258,6 @@
         </div>
     </div>
 
-    <h3>1. Artwork & Matting</h3>
     <div class="grid">
         <div><label>Art Width (mm)</label><input id="picW" value="210"></div>
         <div><label>Art Height (mm)</label><input id="picH" value="297"></div>
@@ -246,7 +266,7 @@
     <label>
         Mat Border Widths (mm) 
         <button onclick="syncBorders()" style="display: inline-block; margin-left: 10px; padding: 2px 8px; font-size: 10px; height: 22px; width: auto; background: #95a5a6; color: white; vertical-align: middle;">🔗 Sync All</button>
-        <span class="info-icon" data-tooltip="Width of the mat board on each side, from picture edge.">i</span>
+        <span class="info-icon" data-tooltip="Width of the mat board on each side, from picture edge to the frame rebate internal edge.">i</span>
     </label>
     <div class="quad-grid">
         <div><label style="font-size:10px">Top</label><input id="matT" value="50"></div>
@@ -256,17 +276,17 @@
     </div>
 
     <div style="margin-top:15px">
-        <label id="overlapLabel">Art/Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm. This will dictate the mat hole size">i</span></label>
+        <label id="overlapLabel">Art/Mat Overlap per side (mm) <span class="info-icon" data-tooltip="Standard overlap is 5mm. This will dictate the mat opening size">i</span></label>
         <input id="overlap" value="5">
     </div>
 
-    <h3>2. Timber & Stack Thickness</h3>
+    <h3>3. Timber & Stack Thickness</h3>
     <div class="triple-grid">
         <div><label>Face Width</label><input id="fmW" value="30"></div>
         <div><label>Timber Depth</label><input id="fmH" value="20"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-            <div><label>Rebate W <span class="info-icon" data-tooltip="Standard width is 6mm.">i</span></label><input id="rebateWidth" value="6"></div>
-            <div><label>Rebate D <span class="info-icon" data-tooltip="Standard depth is 12mm.">i</span></label><input id="rebateDepth" value="12"></div>
+            <div><label>Rebate W <span class="info-icon" data-tooltip="Standard width is 6mm. AKA Rabbet">i</span></label><input id="rebateWidth" value="6"></div>
+            <div><label>Rebate D <span class="info-icon" data-tooltip="Standard depth is 12mm. AKA Rabbet">i</span></label><input id="rebateDepth" value="12"></div>
         </div>
     </div>
     <div class="triple-grid">
@@ -279,28 +299,28 @@
         <div><label>Tolerance (mm) <span class="info-icon" data-tooltip="Standard tolerance is 2 or 3mm.">i</span></label><input id="tolerance" value="2"></div>
     </div>
 
-    <h3>3. Other detail</h3>
+    <h3>4. Other detail</h3>
     <div style="margin-top: 20px;">
-        <label>Project Notes <span class="info-icon" data-tooltip="Internal notes for the workshop, saved with the project.">i</span></label>
-        <textarea id="projectNotes" 
+        <label>Job Notes <span class="info-icon" data-tooltip="Internal notes for the job.">i</span></label>
+        <textarea id="jobNotes" 
             rows="1" 
             oninput="autoExpand(this)" 
-            placeholder="e.g. Acid-free tape required, double-check rebate fit..." 
+            placeholder="" 
             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;">
         </textarea>
     </div>
 
-    <h3>4. Material Stock & Ordering</h3>
+    <h3>5. Material Stock & Ordering</h3>
     <div class="grid">
         <div><label>Timber Length (mm)</label><input id="stickLen" value="1200"></div>
         <div><label>Waste Margin (%)</label><input id="wastePercent" value="10"></div>
     </div>
 
     <div class="results-section">
-        <div class="res-card"><label style="font-size:0.6rem">MAT WINDOW <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="windowResult">—</span></div>
+        <div class="res-card"><label style="font-size:0.6rem">MAT OPENING <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="openingResult">—</span></div>
         <div class="res-card" style="border-left-color: var(--mat); background: #faf5ff;">
-            <label style="font-size:0.6rem">MAT HOLE START (X/Y) <span class="info-icon" data-tooltip="Measurement from top-left of mat board to the start of the window cut.">i</span></label>
-            <span class="val" id="matHoleStartResult">—</span>
+            <label style="font-size:0.6rem">MAT OPENING START (X/Y) <span class="info-icon" data-tooltip="Measurement from top-left of mat board to the start of the opening cut.">i</span></label>
+            <span class="val" id="matOpeningStartResult">—</span>
         </div>
         <div class="res-card"><label style="font-size:0.6rem">GLASS & MAT SIZE <span class="info-icon" data-tooltip="Picture plus mat (including rebate width)">i</span></label><span class="val" id="glassResult">—</span></div>
         <div class="res-card timber"><label style="font-size:0.6rem">TIMBER WIDTH <span class="info-icon" data-tooltip="Outer dimensions of the timber (mitre point to mitre point), including tolerance">i</span></label><span class="val" id="outFrmW">—</span></div>
@@ -367,8 +387,8 @@
             <h4 style="color: var(--primary); margin-bottom: 5px;">📐 Dimensional Calculations</h4>
             <ul style="margin-top: 0;">
                 <li><strong>Art + Margin Logic:</strong> Calculates frame size based on artwork dimensions plus user-defined borders.</li>
-                <li><strong>Window Sizing:</strong> Automatically subtracts "Overlap" from art dimensions to ensure the mat board secures the artwork.</li>
-                <li><strong>Mat Hole Start:</strong> Provides precise X/Y coordinates for mat-cutter guide settings.</li>
+                <li><strong>Opening Sizing:</strong> Automatically subtracts "Overlap" from art dimensions to ensure the mat board secures the artwork.</li>
+                <li><strong>Mat Opening Start:</strong> Provides precise X/Y coordinates for mat-cutter guide settings.</li>
                 <li><strong>Outer Timber Specs:</strong> Calculates exact "tip-to-tip" mitre cuts, accounting for timber face width, rebate width, and glass tolerance.</li>
             </ul>
 
@@ -376,13 +396,13 @@
             <ul style="margin-top: 0;">
                 <li><strong>Side-Profile Stack:</strong> A real-time cross-section previewing Glass, Spacer, Mat, and Backing.</li>
                 <li><strong>Rebate Depth Validation:</strong> Automatically checks if your material stack fits within the timber's rebate depth.</li>
-                <li><strong>Min Rebate Requirement:</strong> Displays the absolute minimum rebate depth needed for the current project.</li>
+                <li><strong>Min Rebate Requirement:</strong> Displays the absolute minimum rebate depth needed for the current job.</li>
                 <li><strong>Overflow Warnings:</strong> Provides visual color-coded warnings (Red/Green) if the materials exceed the frame depth.</li>
             </ul>
 
             <h4 style="color: var(--primary); margin-bottom: 5px;">📋 Workshop & Data Tools</h4>
             <ul style="margin-top: 0;">
-                <li><strong>Cloud Syncing:</strong> Integrated with Google Apps Script to backup and retrieve projects from a central database.</li>
+                <li><strong>Cloud Syncing:</strong> Integrated with Google Apps Script to backup and retrieve jobs from a central database.</li>
                 <li><strong>Local Persistence:</strong> Automatically saves your "current session" so data is never lost on refresh.</li>
                 <li><strong>Sync Status:</strong> Real-time indicator showing if changes are locally saved or synced to the cloud.</li>
                 <li><strong>Auto-Expanding Notes:</strong> A smart text area for workshop instructions that grows vertically as you type.</li>
@@ -405,23 +425,26 @@ const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
 const G_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxChg_RdktgR6CGRYsel5Z8rs9ZbJyj3mR6tm16Ng_drJc1tnuDt9s8VSJU1okovorb/exec";
 
-const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", "tBack", "stickLen", "wastePercent", "projectNotes", "projectAbout"];
+const inputIds = [
+    "picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", 
+    "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", 
+    "tBack", "stickLen", "wastePercent", "jobNotes", 
+    "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium" // Added jobUrl here
+];
 
 function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
 
-function updateProjectDropdown() {
+function updateJobDropdown() {
     const lib = getLibrary();
-    const select = document.getElementById("loadProjectSelect");
-    const badge = document.getElementById("projectCountBadge");
+    const select = document.getElementById("loadJobSelect");
+    const badge = document.getElementById("jobCountBadge");
     
-    const projectNames = Object.keys(lib).sort();
+    const jobNames = Object.keys(lib).sort();
     
-    // Update the Badge Count
-    badge.textContent = projectNames.length;
+    badge.textContent = jobNames.length;
     
-    // Update the Select Options
     select.innerHTML = '<option value="">-- Load Saved --</option>';
-    projectNames.forEach(name => {
+    jobNames.forEach(name => {
         const opt = document.createElement("option");
         opt.value = name; 
         opt.textContent = name;
@@ -442,16 +465,14 @@ function syncBorders() {
     document.getElementById("matL").value = topVal;
     document.getElementById("matR").value = topVal;
     
-    // Trigger the calculation and auto-save after syncing
     calc(); 
     autoSaveCurrentState();
-    setCloudStatus(false); // Add this so the orange "Unsaved" appears
+    setCloudStatus(false);
 }
 
 function autoExpand(field) {
-    field.style.height = 'inherit'; // Reset height
+    field.style.height = 'inherit'; 
     const computed = window.getComputedStyle(field);
-    // Calculate the height
     const height = parseInt(field.scrollHeight) + 
                    parseInt(computed.getPropertyValue('border-top-width')) + 
                    parseInt(computed.getPropertyValue('border-bottom-width'));
@@ -472,14 +493,13 @@ function setCloudStatus(isSynced) {
 async function syncFromCloud() {
     try {
         const response = await fetch(G_SCRIPT_URL);
-        const cloudProjects = await response.json();
+        const cloudJobs = await response.json();
         
-        // Merge cloud projects into LocalStorage so the app stays fast
         const localLib = getLibrary();
-        const mergedLib = { ...localLib, ...cloudProjects };
+        const mergedLib = { ...localLib, ...cloudJobs };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedLib));
         
-        updateProjectDropdown();
+        updateJobDropdown();
         console.log("Cloud sync complete.");
     } catch (err) {
         console.error("Cloud fetch failed, using local data only.", err);
@@ -500,54 +520,38 @@ function toggleDetails() {
 }
 
 function calc() {
-    // 1. DATA COLLECTION
-    // Creates an object 'v' and fills it with values from all input IDs
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
         v[id] = el ? parseFloat(el.value) || 0 : 0;
     });
 
-    // Determine if we should subtract overlap from calculations
     const mode = document.getElementById("overlapMode").value;
-    if (v.picW <= 0 || v.picH <= 0) return; // Exit if dimensions aren't valid
+    if (v.picW <= 0 || v.picH <= 0) return; 
     const over = mode === "no" ? 0 : v.overlap;
 
-    // 2. MAT WINDOW CALCULATION
-    // Calculates the actual hole cut into the mat board (the "starting point" for the visible mat)
     const winW = v.picW - (over * 2);
     const winH = v.picH - (over * 2);
 
-    // MAT HOLE START COORDINATES
-    // Calculated from outer mat edge to the start of the hole
-    const matHoleStartX = v.matL + over;
-    const matHoleStartY = v.matT + over;
+    const matOpeningStartX = v.matL + over;
+    const matOpeningStartY = v.matT + over;
 
-    // 3. GLASS SIZE CALCULATION
-    // Glass must cover the Art + Borders
     const glassW = v.picW + v.matL + v.matR;
     const glassH = v.picH + v.matT + v.matB;
 
-    // 4. TIMBER CUT CALCULATION
-    // Outer dimensions of the timber (mitre point to mitre point) + a small tolerance for movement
     const cutW = glassW + (2 * (v.fmW - v.rebateWidth)) + v.tolerance;
     const cutH = glassH + (2 * (v.fmW - v.rebateWidth)) + v.tolerance;
 
-    // Calculate absolute minimum depth needed
     const minRequired = v.tGlass + v.tSpacer + v.tMat + v.tBack;
     
-    // Update the new result label
     document.getElementById("minRebateResult").innerText = minRequired.toFixed(1) + " mm";
 
-    // 5. UPDATE RESULTS LABELS
-    document.getElementById("windowResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
+    document.getElementById("openingResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
     document.getElementById("glassResult").innerText = Math.round(glassW) + "x" + Math.round(glassH) + " mm";
-    document.getElementById("matHoleStartResult").innerText = `L: ${Math.round(matHoleStartX)} | T: ${Math.round(matHoleStartY)} mm`;
+    document.getElementById("matOpeningStartResult").innerText = `L: ${Math.round(matOpeningStartX)} | T: ${Math.round(matOpeningStartY)} mm`;
     document.getElementById("outFrmW").innerText = Math.round(cutW) + " mm";
     document.getElementById("outFrmH").innerText = Math.round(cutH) + " mm";
 
-    // 6. TIMBER ORDERING LOGIC
-    // Calculates total linear length, adds waste, and determines number of sticks
     const netLinear = (cutW * 2) + (cutH * 2);
     const wasteMultiplier = 1 + (v.wastePercent / 100);
     const grossLinear = Math.round(netLinear * wasteMultiplier); 
@@ -556,28 +560,22 @@ function calc() {
     document.getElementById("totalTimber").innerText = (grossLinear / 1000).toFixed(2) + " m";
     document.getElementById("stickCount").innerText = `${sticksNeeded} x ${v.stickLen}mm lengths`;
 
-    // 7. WORKSHOP PREVIEW (Main Front View)
-    // Scales the visual representation to fit the screen
     const fv = document.getElementById("frame-preview");
     const mv = document.getElementById("mat-preview");
     const pv = document.getElementById("pic-preview");
     
-    // Resize the Frame, Mat, and Picture elements
     fv.style.width = (cutW * scale) + "px";
     fv.style.height = (cutH * scale) + "px";
     mv.style.width = (glassW * scale) + "px";
     mv.style.height = (glassH * scale) + "px";
     
-    // Position the mat inside the frame rebateWidth
     mv.style.left = mv.style.top = ((v.fmW - v.rebateWidth) * scale) + "px";
     
-    // Resize and position the art relative to the mat borders
     pv.style.width = (v.picW * scale) + "px";
     pv.style.height = (v.picH * scale) + "px";
     pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
     pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
 
-    // 8. STACK PREVIEW (Side Profile/Cross-Section)
     const stackTotal = v.tGlass + v.tSpacer + v.tMat + v.tBack;
     const remain = v.rebateDepth - stackTotal; 
     
@@ -586,44 +584,34 @@ function calc() {
     const depthInput = document.getElementById("rebateDepth");
     const status = document.getElementById("fit-status");
     
-    // Scale factors for the preview
     const tw = v.fmW * csScale; 
     const th = v.fmH * csScale; 
     const rw = v.rebateWidth * csScale; 
     const rd = v.rebateDepth * csScale; 
 
-    // 1. Set Timber Dimensions & Clip-Path
-    // We calculate the 'notch' position based on the face width minus rebate width
     timber.style.width = tw + "px";
     timber.style.height = th + "px";
     
     const faceEdgePx = tw - rw; 
     const faceEdgePercent = (faceEdgePx / tw) * 100;
     
-    // Clip-Path: Bottom-Left -> Top-Left -> Notch-Start -> Notch-Bottom -> Bottom-Right
     timber.style.clipPath = `polygon(0% 100%, 0% 0%, ${faceEdgePercent}% 0%, ${faceEdgePercent}% ${rd}px, 100% ${rd}px, 100% 100%)`;
     
-    // 2. Align the Material Stack in the rebate
     stack.style.width = rw + "px"; 
     stack.style.left = faceEdgePx + "px";
     stack.style.top = "0px"; 
     
-    // 3. Size the individual layers
     document.getElementById("vGlass").style.height = (v.tGlass * csScale) + "px";
-    document.getElementById("vSpacer").style.height = (v.tSpacer * csScale) + "px"; // Size the gap
+    document.getElementById("vSpacer").style.height = (v.tSpacer * csScale) + "px"; 
     document.getElementById("vMat").style.height = (v.tMat * csScale) + "px";
     document.getElementById("vBack").style.height = (v.tBack * csScale) + "px";
 
-    // 4. Position the stack so it sits on the "bottom" of the rebate
     const stackHeightPx = stackTotal * csScale;
     stack.style.transform = `translateY(${rd - stackHeightPx}px)`;
 
-    // 9. UPDATE FIT STATUS & VISUAL WARNING
     if (v.rebateDepth >= minRequired) {
-        // Safe: Green UI
         depthInput.style.backgroundColor = "#fff";
     } else {
-        // Warning: Red UI
         depthInput.style.backgroundColor = "#fff5f5";
     }
 
@@ -635,7 +623,6 @@ function calc() {
     } else {
         status.innerText = `TOO THICK (${Math.abs(remain).toFixed(1)}mm overflow)`;
         status.style.color = "#e74c3c";
-        // Visual warning on the input field
         depthInput.style.borderColor = "#e74c3c";
         depthInput.style.backgroundColor = "#fff5f5";
     }
@@ -647,32 +634,27 @@ function autoSaveCurrentState() {
     localStorage.setItem(SESSION_KEY, JSON.stringify(data));
 }
 
-// Existing listener loop handles this:
 document.querySelectorAll("input, select, textarea").forEach(el => {
     el.addEventListener("input", () => {
         if (el.id === "overlapMode") updateOverlapUI();
         calc();
         autoSaveCurrentState(); 
-
-        // Mark cloud as out-of-sync
         setCloudStatus(false);
     });
 });
 
-document.getElementById("saveProjectBtn").addEventListener("click", async function() {
-    const name = document.getElementById("projectName").value.trim();
-    if (!name) return alert("Enter project name.");
+document.getElementById("saveJobBtn").addEventListener("click", async function() {
+    const name = document.getElementById("jobName").value.trim();
+    if (!name) return alert("Enter job name.");
 
-    // 1. LOCAL SAVE
     const lib = getLibrary();
     const settings = { overlapMode: document.getElementById("overlapMode").value };
     inputIds.forEach(id => settings[id] = document.getElementById(id).value);
     
     lib[name] = settings;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
-    updateProjectDropdown();
+    updateJobDropdown();
 
-    // 2. CLOUD SYNC (Visual Feedback)
     const btn = this;
     const originalText = "Save";
     const originalBG = btn.style.background;
@@ -686,21 +668,19 @@ document.getElementById("saveProjectBtn").addEventListener("click", async functi
             mode: "no-cors", 
             cache: "no-cache",
             body: JSON.stringify({
-                projectName: name,
+                jobName: name,
                 settings: settings
             })
         });
 
-        // Success State
         btn.innerText = "Saved & Synced!";
-        btn.style.background = "#2ecc71"; // Change to success green
+        btn.style.background = "#2ecc71"; 
         setCloudStatus(true);
     } catch (err) {
         console.error(err);
         btn.innerText = "Local Saved (Sync Error)";
-        btn.style.background = "#e67e22"; // Change to warning orange
+        btn.style.background = "#e67e22"; 
     } finally {
-        // Revert button after 3 seconds
         setTimeout(() => {
             btn.innerText = originalText;
             btn.style.background = originalBG;
@@ -709,14 +689,13 @@ document.getElementById("saveProjectBtn").addEventListener("click", async functi
     }
 });
 
-document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
+document.getElementById("loadJobSelect").addEventListener("change", (e) => {
     const lib = getLibrary();
     const data = lib[e.target.value];
     if (data) {
-        document.getElementById("projectName").value = e.target.value;
+        document.getElementById("jobName").value = e.target.value;
         document.getElementById("overlapMode").value = data.overlapMode || "yes";
 
-        // UPDATED LOOP: If data is missing (undefined), set value to empty string ""
         inputIds.forEach(id => { 
             const el = document.getElementById(id);
             if (el) {
@@ -724,9 +703,8 @@ document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
             }
         });
 
-        // Trigger auto-expand for both textareas
-        autoExpand(document.getElementById("projectNotes"));
-        autoExpand(document.getElementById("projectAbout"));
+        autoExpand(document.getElementById("jobNotes"));
+        autoExpand(document.getElementById("jobAbout"));
         
         updateOverlapUI(); 
         calc();
@@ -734,40 +712,35 @@ document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
     }
 });
 
-document.getElementById("deleteProjectBtn").addEventListener("click", async function() {
-    const select = document.getElementById("loadProjectSelect");
+document.getElementById("deleteJobBtn").addEventListener("click", async function() {
+    const select = document.getElementById("loadJobSelect");
     const name = select.value;
 
-    if (!name) return alert("Please select a project from the dropdown to delete.");
+    if (!name) return alert("Please select a job from the dropdown to delete.");
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
 
     const btn = this;
     const originalText = "Delete";
     const originalBG = btn.style.background;
 
-    // 1. VISUAL FEEDBACK START
     btn.innerText = "Deleting...";
     btn.disabled = true;
 
-    // 2. IMMEDIATE LOCAL UPDATE
     const lib = getLibrary();
     delete lib[name];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
     
-    // Refresh UI immediately
-    updateProjectDropdown();
-    document.getElementById("projectName").value = "";
+    updateJobDropdown();
+    document.getElementById("jobName").value = "";
 
-    // 3. BACKGROUND CLOUD SYNC (Non-blocking)
     fetch(G_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify({ projectName: name, delete: true })
+        body: JSON.stringify({ jobName: name, delete: true })
     }).catch(err => console.error("Cloud delete failed in background", err));
 
-    // 4. VISUAL FEEDBACK SUCCESS
     btn.innerText = "Deleted!";
-    btn.style.background = "#2ecc71"; // Turn green briefly to show success
+    btn.style.background = "#2ecc71"; 
 
     setTimeout(() => {
         btn.innerText = originalText;
@@ -788,24 +761,33 @@ document.getElementById("presetSelect").addEventListener("change", (e) => {
 
 document.getElementById("copyBtn").addEventListener("click", () => {
     const v = {};
-    // Collect all current values from inputs
     inputIds.forEach(id => {
         const el = document.getElementById(id);
         v[id] = el ? el.value : "";
     });
 
     const mode = document.getElementById("overlapMode").value;
-    const notes = document.getElementById("projectNotes").value;
-    const about = document.getElementById("projectAbout").value; // <--- NEW
-    const project = document.getElementById("projectName").value || "Unnamed Project";
+    const notes = document.getElementById("jobNotes").value;
+    const about = document.getElementById("jobAbout").value;
+    const job = document.getElementById("jobName").value || "Unnamed Job";
+    
+    const artist = document.getElementById("artArtist").value;
+    const year = document.getElementById("artYear").value;
+    const medium = document.getElementById("artMedium").value;
+    const url = document.getElementById("jobUrl").value;
 
-    const text = `--- FRAME PROJECT: ${project.toUpperCase()} ---
-${about ? 'ABOUT: ' + about + '\n' : ''} 
+    let artworkLine = "";
+    if (artist || year || medium || url) {
+        artworkLine = `ARTWORK: ${artist || 'Unknown'} (${year || 'N/A'}) - ${medium || 'N/A'}${url ? '\nURL: ' + url : ''}\n`;
+    }
+
+    const text = `--- FRAME JOB: ${job.toUpperCase()} ---
+${about ? 'ABOUT: ' + about + '\n' : ''}${artworkLine}
 PRODUCTION CUTS:
 • Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
 • Glass/Mat: ${document.getElementById("glassResult").innerText}
-• Mat Window: ${document.getElementById("windowResult").innerText}
-• Mat Hole Start: ${document.getElementById("matHoleStartResult").innerText}
+• Mat Opening: ${document.getElementById("openingResult").innerText}
+• Mat Opening Start: ${document.getElementById("matOpeningStartResult").innerText}
 
 MATERIAL STACK:
 • Glass: ${v.tGlass}mm | Spacer: ${v.tSpacer}mm
@@ -830,7 +812,7 @@ ${notes || 'No notes provided'}
         const originalText = btn.innerText;
         btn.innerText = "✓ Copied All Settings";
         btn.style.background = "#27ae60";
-        btn.style.color = "white"; // Ensure text is visible
+        btn.style.color = "white";
         setTimeout(() => {
             btn.innerText = originalText;
             btn.style.background = "";
@@ -838,14 +820,17 @@ ${notes || 'No notes provided'}
         }, 2000);
     });
 });
+
 document.getElementById("resetBtn").addEventListener("click", () => {
-    if(confirm("Reset current screen?")) { localStorage.removeItem(SESSION_KEY); location.reload(); }
+    if(confirm("Clear current screen and start a new job?")) { 
+        localStorage.removeItem(SESSION_KEY); 
+        document.getElementById("jobName").value = "";
+        location.reload(); 
+    }
 });
 
-
-
 window.onload = async () => {
-    updateProjectDropdown();
+    updateJobDropdown();
     
     const lastSession = localStorage.getItem(SESSION_KEY);
     if (lastSession) {
@@ -855,13 +840,14 @@ window.onload = async () => {
             if (d[id] !== undefined) document.getElementById(id).value = d[id]; 
         });
         
-        autoExpand(document.getElementById("projectNotes"));
-        autoExpand(document.getElementById("projectAbout"));
+        autoExpand(document.getElementById("jobNotes"));
+        autoExpand(document.getElementById("jobAbout"));
         updateOverlapUI();
         calc();
         setCloudStatus(true);
     } else {
-        // If there is no session (after a Reset), set a neutral "Ready" status
+        updateOverlapUI(); 
+        calc();            
         const status = document.getElementById("cloudStatus");
         status.innerText = "✓ Ready";
         status.style.color = "#27ae60";
