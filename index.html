@@ -210,6 +210,15 @@
         </div>
     </div>
 
+    <div style="margin-bottom: 20px;">
+        <label>About Project / Client <span class="info-icon" data-tooltip="General project description. Saved with the project.">i</span></label>
+        <textarea id="projectAbout" 
+            rows="1" 
+            oninput="autoExpand(this)" 
+            placeholder="e.g. Framing of print for ..." 
+            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;">
+        </textarea>
+    </div>
     <div class="grid">
         <div>
             <label>Presets <span class="info-icon" data-tooltip="Common frame setups.">i</span></label>
@@ -396,7 +405,7 @@ const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
 const G_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxChg_RdktgR6CGRYsel5Z8rs9ZbJyj3mR6tm16Ng_drJc1tnuDt9s8VSJU1okovorb/exec";
 
-const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", "tBack", "stickLen", "wastePercent", "projectNotes"];
+const inputIds = ["picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", "tBack", "stickLen", "wastePercent", "projectNotes", "projectAbout"];
 
 function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
 
@@ -705,12 +714,22 @@ document.getElementById("loadProjectSelect").addEventListener("change", (e) => {
     const data = lib[e.target.value];
     if (data) {
         document.getElementById("projectName").value = e.target.value;
-        document.getElementById("overlapMode").value = data.overlapMode;
-        inputIds.forEach(id => { if (data[id] !== undefined) document.getElementById(id).value = data[id]; });
-        // TRIGGER AUTO-EXPAND FOR NOTES
-        const notesField = document.getElementById("projectNotes");
-        autoExpand(notesField);
-        updateOverlapUI(); calc();
+        document.getElementById("overlapMode").value = data.overlapMode || "yes";
+
+        // UPDATED LOOP: If data is missing (undefined), set value to empty string ""
+        inputIds.forEach(id => { 
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = data[id] !== undefined ? data[id] : ""; 
+            }
+        });
+
+        // Trigger auto-expand for both textareas
+        autoExpand(document.getElementById("projectNotes"));
+        autoExpand(document.getElementById("projectAbout"));
+        
+        updateOverlapUI(); 
+        calc();
         setCloudStatus(true);
     }
 });
@@ -777,10 +796,11 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 
     const mode = document.getElementById("overlapMode").value;
     const notes = document.getElementById("projectNotes").value;
+    const about = document.getElementById("projectAbout").value; // <--- NEW
     const project = document.getElementById("projectName").value || "Unnamed Project";
 
     const text = `--- FRAME PROJECT: ${project.toUpperCase()} ---
-
+${about ? 'ABOUT: ' + about + '\n' : ''} 
 PRODUCTION CUTS:
 • Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
 • Glass/Mat: ${document.getElementById("glassResult").innerText}
@@ -806,18 +826,18 @@ ${notes || 'No notes provided'}
 -------------------------------------------`;
 
     navigator.clipboard.writeText(text).then(() => {
-        // Visual feedback on the button
         const btn = document.getElementById("copyBtn");
         const originalText = btn.innerText;
         btn.innerText = "✓ Copied All Settings";
         btn.style.background = "#27ae60";
+        btn.style.color = "white"; // Ensure text is visible
         setTimeout(() => {
             btn.innerText = originalText;
             btn.style.background = "";
+            btn.style.color = "";
         }, 2000);
     });
 });
-
 document.getElementById("resetBtn").addEventListener("click", () => {
     if(confirm("Reset current screen?")) { localStorage.removeItem(SESSION_KEY); location.reload(); }
 });
@@ -836,6 +856,7 @@ window.onload = async () => {
         });
         
         autoExpand(document.getElementById("projectNotes"));
+        autoExpand(document.getElementById("projectAbout"));
         updateOverlapUI();
         calc();
         setCloudStatus(true);
