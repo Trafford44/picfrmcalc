@@ -239,7 +239,7 @@
         </div>
     </div>
 
-    <h3>2. Artwork & Matting</h3>
+    <h3>2. Artwork & Mounting</h3>
     <div class="grid">
         <div>
             <label>Presets <span class="info-icon" data-tooltip="Common frame setups.">i</span></label>
@@ -250,10 +250,10 @@
             </select>
         </div>
         <div>
-            <label>Art/Mat Overlap Mode <span class="info-icon" data-tooltip="Active Overlap ensures the mat board 'bites' the art. Use for 'floating' mounts'">i</span></label>
-            <select id="overlapMode">
-                <option value="yes">Active Overlap</option>
-                <option value="no">Flush (No Overlap)</option>
+            <label>Mount Style</label>
+            <select id="mountStyle">
+                <option value="standard">Standard Window Mount</option>
+                <option value="float">Float Mount</option>
             </select>
         </div>
     </div>
@@ -301,7 +301,7 @@
 
     <h3>4. Other detail</h3>
     <div style="margin-top: 20px;">
-        <label>Job Notes <span class="info-icon" data-tooltip="Internal notes for the job.">i</span></label>
+        <label>Job Notes <span class="info-icon" data-tooltip="Capture details of the job.">i</span></label>
         <textarea id="jobNotes" 
             rows="1" 
             oninput="autoExpand(this)" 
@@ -317,7 +317,7 @@
     </div>
 
     <div class="results-section">
-        <div class="res-card"><label style="font-size:0.6rem">MAT OPENING <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="openingResult">—</span></div>
+        <div class="res-card"><label id="openingLabel" style="font-size:0.6rem">MAT OPENING <span class="info-icon" data-tooltip="Picture less overlap">i</span></label><span class="val" id="openingResult">—</span></div>
         <div class="res-card" style="border-left-color: var(--mat); background: #faf5ff;">
             <label style="font-size:0.6rem">MAT OPENING START (X/Y) <span class="info-icon" data-tooltip="Measurement from top-left of mat board to the start of the opening cut.">i</span></label>
             <span class="val" id="matOpeningStartResult">—</span>
@@ -429,7 +429,7 @@ const inputIds = [
     "picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", 
     "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", 
     "tBack", "stickLen", "wastePercent", "jobNotes", 
-    "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium" // Added jobUrl here
+    "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"
 ];
 
 function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
@@ -450,13 +450,6 @@ function updateJobDropdown() {
         opt.textContent = name;
         select.appendChild(opt);
     });
-}
-
-function updateOverlapUI() {
-    const mode = document.getElementById("overlapMode").value;
-    const isNo = mode === "no";
-    document.getElementById("overlap").disabled = isNo;
-    document.getElementById("overlapLabel").className = isNo ? "disabled-label" : "";
 }
 
 function syncBorders() {
@@ -523,12 +516,13 @@ function calc() {
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
-        v[id] = el ? parseFloat(el.value) || 0 : 0;
+        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"].includes(id);
+        if (isText) v[id] = el.value;
+        else v[id] = parseFloat(el.value) || 0;
     });
 
-    const mode = document.getElementById("overlapMode").value;
-    if (v.picW <= 0 || v.picH <= 0) return; 
-    const over = mode === "no" ? 0 : v.overlap;
+
+    const over = v.overlap;
 
     const winW = v.picW - (over * 2);
     const winH = v.picH - (over * 2);
@@ -544,6 +538,9 @@ function calc() {
 
     const minRequired = v.tGlass + v.tSpacer + v.tMat + v.tBack;
     
+    const isFloat = v.mountStyle === "float";
+    document.getElementById("openingLabel").innerText = isFloat ? "FLOAT BACKING" : "MAT OPENING";
+
     document.getElementById("minRebateResult").innerText = minRequired.toFixed(1) + " mm";
 
     document.getElementById("openingResult").innerText = Math.round(winW) + "x" + Math.round(winH) + " mm";
@@ -629,14 +626,13 @@ function calc() {
 }
 
 function autoSaveCurrentState() {
-    const data = { overlapMode: document.getElementById("overlapMode").value };
+    const data = {};
     inputIds.forEach(id => data[id] = document.getElementById(id).value);
     localStorage.setItem(SESSION_KEY, JSON.stringify(data));
 }
 
 document.querySelectorAll("input, select, textarea").forEach(el => {
     el.addEventListener("input", () => {
-        if (el.id === "overlapMode") updateOverlapUI();
         calc();
         autoSaveCurrentState(); 
         setCloudStatus(false);
@@ -648,7 +644,7 @@ document.getElementById("saveJobBtn").addEventListener("click", async function()
     if (!name) return alert("Enter job name.");
 
     const lib = getLibrary();
-    const settings = { overlapMode: document.getElementById("overlapMode").value };
+    const settings = {};
     inputIds.forEach(id => settings[id] = document.getElementById(id).value);
     
     lib[name] = settings;
@@ -694,7 +690,6 @@ document.getElementById("loadJobSelect").addEventListener("change", (e) => {
     const data = lib[e.target.value];
     if (data) {
         document.getElementById("jobName").value = e.target.value;
-        document.getElementById("overlapMode").value = data.overlapMode || "yes";
 
         inputIds.forEach(id => { 
             const el = document.getElementById(id);
@@ -706,7 +701,6 @@ document.getElementById("loadJobSelect").addEventListener("change", (e) => {
         autoExpand(document.getElementById("jobNotes"));
         autoExpand(document.getElementById("jobAbout"));
         
-        updateOverlapUI(); 
         calc();
         setCloudStatus(true);
     }
@@ -763,10 +757,11 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
-        v[id] = el ? el.value : "";
+        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"].includes(id);
+        if (isText) v[id] = el.value;
+        else v[id] = parseFloat(el.value) || 0;
     });
 
-    const mode = document.getElementById("overlapMode").value;
     const notes = document.getElementById("jobNotes").value;
     const about = document.getElementById("jobAbout").value;
     const job = document.getElementById("jobName").value || "Unnamed Job";
@@ -775,6 +770,8 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const year = document.getElementById("artYear").value;
     const medium = document.getElementById("artMedium").value;
     const url = document.getElementById("jobUrl").value;
+    const openingLabel = document.getElementById("openingLabel").innerText;
+    const sentenceCaseOpeningLabel = openingLabel.charAt(0).toUpperCase() + openingLabel.slice(1).toLowerCase();
 
     let artworkLine = "";
     if (artist || year || medium || url) {
@@ -786,7 +783,7 @@ ${about ? 'ABOUT: ' + about + '\n' : ''}${artworkLine}
 PRODUCTION CUTS:
 • Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
 • Glass/Mat: ${document.getElementById("glassResult").innerText}
-• Mat Opening: ${document.getElementById("openingResult").innerText}
+• ${sentenceCaseOpeningLabel}: ${document.getElementById("openingResult").innerText}
 • Mat Opening Start: ${document.getElementById("matOpeningStartResult").innerText}
 
 MATERIAL STACK:
@@ -798,7 +795,8 @@ MATERIAL STACK:
 TECHNICAL SETTINGS:
 • Art Size: ${v.picW}x${v.picH}mm
 • Borders (T/B/L/R): ${v.matT}/${v.matB}/${v.matL}/${v.matR}mm
-• Overlap: ${mode === 'yes' ? v.overlap + 'mm' : 'None'}
+• Overlap: ${v.overlap}mm
+• Mount: ${v.mountStyle}
 • Timber Profile: ${v.fmW}mm Face / ${v.fmH}mm Depth
 • Rebate: ${v.rebateWidth}mm Wide / ${v.rebateDepth}mm Deep
 • Tolerance: ${v.tolerance}mm
@@ -835,18 +833,15 @@ window.onload = async () => {
     const lastSession = localStorage.getItem(SESSION_KEY);
     if (lastSession) {
         const d = JSON.parse(lastSession);
-        if (d.overlapMode) document.getElementById("overlapMode").value = d.overlapMode;
         inputIds.forEach(id => { 
             if (d[id] !== undefined) document.getElementById(id).value = d[id]; 
         });
         
         autoExpand(document.getElementById("jobNotes"));
         autoExpand(document.getElementById("jobAbout"));
-        updateOverlapUI();
         calc();
         setCloudStatus(true);
     } else {
-        updateOverlapUI(); 
         calc();            
         const status = document.getElementById("cloudStatus");
         status.innerText = "✓ Ready";
