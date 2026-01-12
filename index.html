@@ -84,9 +84,9 @@
         .preview-box { background: #e0e0e0; padding: 20px; border-radius: 8px; border: 1px rebate #ccc; display: flex; flex-direction: column; align-items: center; min-height: 400px; position: relative; overflow: hidden; }
         .preview-label { font-size: 10px; font-weight: bold; color: #7f8c8d; margin-bottom: 15px; text-transform: uppercase; }
 
-        #frame-preview { transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #2c1a0b; }
-        #mat-preview { border: 1px solid #ddd; position: absolute; }
-        #pic-preview { background-image: linear-gradient(45deg, #add8e6 25%, #bfe2ed 25%, #bfe2ed 50%, #add8e6 50%, #add8e6 75%, #bfe2ed 75%, #bfe2ed 100%); background-size: 20px 20px; border: 1px solid #999; }
+        #frame-preview { transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #2c1a0b; position: absolute; }
+        #mat-preview { border: 1px solid #ddd; position: absolute; background-color: #fdfdfd;}
+        #pic-preview { background-image: linear-gradient(45deg, #add8e6 25%, #bfe2ed 25%, #bfe2ed 50%, #add8e6 50%, #add8e6 75%, #bfe2ed 75%, #bfe2ed 100%); background-size: 20px 20px; border: 1px solid #999; position: absolute; }
 
         .legend { width: 100%; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 6px; font-size: 10px; margin-bottom: 15px; border: 1px solid #ccc; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
         .legend-item { display: flex; align-items: center; }
@@ -521,7 +521,7 @@ function calc() {
         else v[id] = parseFloat(el.value) || 0;
     });
 
-
+    const isFloat = v.mountStyle === "float";
     const over = v.overlap;
 
     const winW = v.picW - (over * 2);
@@ -537,9 +537,19 @@ function calc() {
     const cutH = glassH + (2 * (v.fmW - v.rebateWidth)) + v.tolerance;
 
     const minRequired = v.tGlass + v.tSpacer + v.tMat + v.tBack;
-    
-    const isFloat = v.mountStyle === "float";
-    document.getElementById("openingLabel").innerText = isFloat ? "FLOAT BACKING" : "MAT OPENING";
+
+    // set lables for mount type
+    let openingText, overlapText;
+    if (v.mountStyle === "float") {
+        openingText = "FLOAT BACKING";
+        overlapText = "Float Margin per side (mm)";
+    } else {
+        openingText = "MAT OPENING";
+        overlapText = "Art/Mat Overlap per side (mm)";
+    }
+    document.getElementById("openingLabel").innerText = openingText;
+    document.getElementById("overlapLabel").innerText = overlapText;
+
 
     document.getElementById("minRebateResult").innerText = minRequired.toFixed(1) + " mm";
 
@@ -570,8 +580,34 @@ function calc() {
     
     pv.style.width = (v.picW * scale) + "px";
     pv.style.height = (v.picH * scale) + "px";
-    pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
-    pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
+
+    // 2. Adjust Preview
+    // Ensure the mat/backing board is positioned correctly relative to the frame
+    mv.style.left = mv.style.top = ((v.fmW - v.rebateWidth) * scale) + "px";
+    if (isFloat) {
+        // Float Look: Art on top with shadow
+        pv.style.zIndex = "10";
+        pv.style.boxShadow = "4px 4px 10px rgba(0,0,0,0.4)";
+        mv.style.overflow = "visible";
+        mv.style.boxShadow = "none"; // Remove bevel if switching from mat
+        
+        // Center art on board
+        pv.style.top = (((glassH - v.picH) / 2) * scale) + "px";
+        pv.style.left = (((glassW - v.picW) / 2) * scale) + "px";
+    } else {
+        // Standard Look: Art tucked under mat
+        pv.style.zIndex = "1";
+        pv.style.boxShadow = "none";
+        mv.style.overflow = "hidden";
+        
+        // Add a 45-degree white bevel effect to the mat opening
+        // This simulates the depth of the mat board
+        mv.style.boxShadow = "inset 2px 2px 0px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.2)";
+        
+        // Position normally
+        pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
+        pv.style.left = ((v.matL - over + (v.tolerance / 2)) * scale) + "px";
+    }
 
     const stackTotal = v.tGlass + v.tSpacer + v.tMat + v.tBack;
     const remain = v.rebateDepth - stackTotal; 
@@ -762,6 +798,23 @@ document.getElementById("copyBtn").addEventListener("click", () => {
         else v[id] = parseFloat(el.value) || 0;
     });
 
+    // 1. Create a Timestamp
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-GB', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+
+    // 2. Define Label Logic
+    const isFloat = v.mountStyle === "float";
+    const labels = {
+        opening: isFloat ? "Float backing" : "Mat opening",
+        overlap: isFloat ? "Float Margin" : "Art/Mat Overlap"
+    };
+
     const notes = document.getElementById("jobNotes").value;
     const about = document.getElementById("jobAbout").value;
     const job = document.getElementById("jobName").value || "Unnamed Job";
@@ -770,8 +823,8 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const year = document.getElementById("artYear").value;
     const medium = document.getElementById("artMedium").value;
     const url = document.getElementById("jobUrl").value;
-    const openingLabel = document.getElementById("openingLabel").innerText;
-    const sentenceCaseOpeningLabel = openingLabel.charAt(0).toUpperCase() + openingLabel.slice(1).toLowerCase();
+    //const openingLabel = document.getElementById("openingLabel").innerText;
+    //const sentenceCaseOpeningLabel = openingLabel.charAt(0).toUpperCase() + openingLabel.slice(1).toLowerCase();
 
     let artworkLine = "";
     if (artist || year || medium || url) {
@@ -779,11 +832,12 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     }
 
     const text = `--- FRAME JOB: ${job.toUpperCase()} ---
+Generated: ${timestamp}
 ${about ? 'ABOUT: ' + about + '\n' : ''}${artworkLine}
 PRODUCTION CUTS:
 • Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
 • Glass/Mat: ${document.getElementById("glassResult").innerText}
-• ${sentenceCaseOpeningLabel}: ${document.getElementById("openingResult").innerText}
+• ${labels.opening}: ${document.getElementById("openingResult").innerText}
 • Mat Opening Start: ${document.getElementById("matOpeningStartResult").innerText}
 
 MATERIAL STACK:
@@ -795,8 +849,8 @@ MATERIAL STACK:
 TECHNICAL SETTINGS:
 • Art Size: ${v.picW}x${v.picH}mm
 • Borders (T/B/L/R): ${v.matT}/${v.matB}/${v.matL}/${v.matR}mm
-• Overlap: ${v.overlap}mm
-• Mount: ${v.mountStyle}
+• ${labels.overlap}: ${v.overlap}mm
+• Mount Style: ${v.mountStyle.charAt(0).toUpperCase() + v.mountStyle.slice(1).toLowerCase()}
 • Timber Profile: ${v.fmW}mm Face / ${v.fmH}mm Depth
 • Rebate: ${v.rebateWidth}mm Wide / ${v.rebateDepth}mm Deep
 • Tolerance: ${v.tolerance}mm
