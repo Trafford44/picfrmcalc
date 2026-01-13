@@ -94,7 +94,21 @@
 
         .cs-container { position: relative; width: 180px; height: 180px; margin-top: 40px; display: flex; align-items: flex-end; justify-content: flex-start; }
         .cs-timber { position: absolute; bottom: 0; left: 0; background: var(--timber); z-index: 5; }
-        .cs-stack { position: absolute; z-index: 10; display: flex; flex-direction: column-reverse; }
+        /* .cs-stack { position: absolute; z-index: 10; display: flex; flex-direction: column-reverse; } */
+
+.cs-stack { 
+    position: absolute; 
+    z-index: 10; 
+    display: flex; 
+    flex-direction: column-reverse; /* Keeps Backing at the bottom */
+    bottom: 24px;   /* This matches the height of the bottom 'lip' of your timber (76px total - 52px cutout) */
+    left: 56px;     /* This matches the horizontal inset of your timber profile */
+}
+
+.cs-layer + .cs-layer {
+    border-bottom: none; /* Prevents double-borders between layers */
+}
+
         .cs-layer { width: 100%; border: 1px solid rgba(0,0,0,0.1); box-sizing: border-box; }
         .cs-axis { position: absolute; font-size: 9px; font-weight: bold; color: #666; }
         #fit-status { font-size: 11px; font-weight: bold; margin-bottom: 10px; }
@@ -146,6 +160,8 @@
             border-left: 4px solid #007bff;
             color: #2c3e50;
         }
+
+
     </style>
 </head>
 <body>
@@ -183,8 +199,8 @@
         </div>
     </div>    
     <h3>Jobs</h3>
-    <div class="job-header-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
-        
+
+    <div class="job-header-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0px 20px; align-items: start;">        
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label>Job Name</label>
             <div style="display: flex; gap: 8px;">
@@ -207,6 +223,12 @@
                 </select>
                 <button id="deleteJobBtn" style="background: #e74c3c; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Delete</button>
             </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <label id="dateCreatedDisplay" style="font-weight: normal;"></label>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <label id="dateUpdatedDisplay" style="font-weight: normal;"></label>
         </div>
     </div>
 
@@ -369,7 +391,7 @@
                     <div class="cs-layer" id="vSpacer" style="background:rgba(0,0,0,0.05); border: 1px dashed #ccc;"></div>
                     <div class="cs-layer" id="vGlass" style="background:var(--glass)"></div>
                 </div>
-                <div class="cs-axis" style="bottom: -18px; width: 60%; text-align: center;">FACE</div>
+                <div class="cs-axis" style="bottom: -18px; width: 60%; text-align: center;">BACK</div>
                 <div class="cs-axis" style="left: -35px; top: 50%; transform: rotate(-90deg);">DEPTH</div>
             </div>
         </div>
@@ -424,6 +446,7 @@ const csScale = 4;
 const STORAGE_KEY = "frameCalcLibrary";
 const SESSION_KEY = "frameCalcCurrentSession";
 const G_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxChg_RdktgR6CGRYsel5Z8rs9ZbJyj3mR6tm16Ng_drJc1tnuDt9s8VSJU1okovorb/exec";
+let jobCreationDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
 const inputIds = [
     "picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", 
@@ -512,6 +535,28 @@ function toggleDetails() {
     }
 }
 
+function updateDateLabels(createdIso, updatedIso) {
+    const createdEl = document.getElementById("dateCreatedDisplay");
+    const updatedEl = document.getElementById("dateUpdatedDisplay");
+
+    const format = (iso) => {
+        if (!iso) return "-";
+        const d = new Date(iso);
+        // Returns "13 Jan 2026 08:30"
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + 
+               " " + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Only show text if createdIso exists
+    if (createdEl) {
+        createdEl.innerText = createdIso ? "Created: " + format(createdIso) : "";
+    }
+    // Only show text if updatedIso exists
+    if (updatedEl) {
+        updatedEl.innerText = updatedIso ? "Updated: " + format(updatedIso) : "";
+    }
+}
+
 function calc() {
     const v = {};
     inputIds.forEach(id => {
@@ -537,6 +582,12 @@ function calc() {
     const cutH = glassH + (2 * (v.fmW - v.rebateWidth)) + v.tolerance;
 
     const minRequired = v.tGlass + v.tSpacer + v.tMat + v.tBack;
+
+    const now = new Date();
+    const lastUpdated = now.toLocaleString('en-GB', { 
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
+    });
+
 
     // set lables for mount type
     let openingText, overlapText;
@@ -602,7 +653,7 @@ function calc() {
         
         // Add a 45-degree white bevel effect to the mat opening
         // This simulates the depth of the mat board
-        mv.style.boxShadow = "inset 2px 2px 0px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.2)";
+        mv.style.boxShadow = "inset 4px 4px 6px rgba(0,0,0,0.2), inset -2px -2px 0px rgba(255,255,255,0.9)";
         
         // Position normally
         pv.style.top = ((v.matT - over + (v.tolerance / 2)) * scale) + "px";
@@ -681,7 +732,18 @@ document.getElementById("saveJobBtn").addEventListener("click", async function()
 
     const lib = getLibrary();
     const settings = {};
+    
+    // Grab all current inputs
     inputIds.forEach(id => settings[id] = document.getElementById(id).value);
+
+    // --- TIMESTAMP LOGIC ---
+    const now = new Date().toISOString();    
+    // If the job already exists, keep its original creation date. Otherwise, 'now' is the creation date.
+    settings.dateCreated = (lib[name] && lib[name].dateCreated) ? lib[name].dateCreated : now;
+    // Update date is always 'now'
+    settings.dateUpdated = now;
+    // Update the labels in the UI immediately
+    updateDateLabels(settings.dateCreated, settings.dateUpdated);
     
     lib[name] = settings;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
@@ -701,13 +763,17 @@ document.getElementById("saveJobBtn").addEventListener("click", async function()
             cache: "no-cache",
             body: JSON.stringify({
                 jobName: name,
-                settings: settings
+                settings: settings // settings now includes dateCreated and dateUpdated
             })
         });
 
         btn.innerText = "Saved & Synced!";
         btn.style.background = "#2ecc71"; 
         setCloudStatus(true);
+        
+        // Refresh the UI display labels
+        updateDateLabels(settings.dateCreated, settings.dateUpdated);
+
     } catch (err) {
         console.error(err);
         btn.innerText = "Local Saved (Sync Error)";
@@ -733,6 +799,9 @@ document.getElementById("loadJobSelect").addEventListener("change", (e) => {
                 el.value = data[id] !== undefined ? data[id] : ""; 
             }
         });
+
+        // Update the subtle metadata display
+        updateDateLabels(data.dateCreated, data.dateUpdated);
 
         autoExpand(document.getElementById("jobNotes"));
         autoExpand(document.getElementById("jobAbout"));
