@@ -224,6 +224,7 @@
                 <button id="deleteJobBtn" style="background: #e74c3c; color: white; width: 100px; flex-shrink: 0; padding: 0; height: 40px;">Delete</button>
             </div>
         </div>
+
         <div style="display: flex; flex-direction: column; gap: 5px;">
             <label id="dateCreatedDisplay" style="font-weight: normal;"></label>
         </div>
@@ -234,17 +235,6 @@
 
 
     <h3 style="margin-top: 20px;">1. Job Background</h3>
-
-    <div class="grid">
-        <div>
-            <label>About Job<span class="info-icon" data-tooltip="General job description.">i</span></label>
-            <textarea id="jobAbout" rows="1" oninput="autoExpand(this)" placeholder="e.g. Framing of print for..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;"></textarea>
-        </div>
-        <div>
-            <label>Reference URL <span class="info-icon" data-tooltip="Link to artist website, portfolio, or source image etc.">i</span></label>
-            <input type="url" id="jobUrl" placeholder="https://artist-site.com/work" style="width: 100%;">
-        </div>
-    </div>
 
     <div class="triple-grid">
         <div>
@@ -259,6 +249,23 @@
             <label>Medium <span class="info-icon" data-tooltip="e.g. Giclée Print, Oil, Watercolor.">i</span></label>
             <input type="text" id="artMedium" placeholder="e.g. Oil on Canvas">
         </div>
+    </div>
+
+    <div class="grid">        
+
+        <div>
+            <label>Art Title<span class="info-icon" data-tooltip="What is the title of the artwork">i</span></label>
+            <input id="artTitle" type="text" placeholder="Enter title..." style="width: 100%;">
+        </div>
+        <div>
+            <label>Reference URL <span class="info-icon" data-tooltip="Link to artist website, portfolio, or source image etc.">i</span></label>
+            <input type="url" id="jobUrl" placeholder="e.g. https://artist-site.com/work" style="width: 100%;">
+        </div>
+    </div>
+
+    <div>
+        <label>About Job<span class="info-icon" data-tooltip="General job description.">i</span></label>
+        <textarea id="jobAbout" rows="1" oninput="autoExpand(this)" placeholder="e.g. Framing of print for..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; resize: none; box-sizing: border-box; overflow:hidden; min-height: 40px;"></textarea>
     </div>
 
     <h3>2. Artwork & Mounting</h3>
@@ -452,7 +459,7 @@ const inputIds = [
     "picW", "picH", "matT", "matB", "matL", "matR", "overlap", "fmW", "fmH", 
     "rebateWidth", "rebateDepth", "tolerance", "tGlass", "tSpacer", "tMat", 
     "tBack", "stickLen", "wastePercent", "jobNotes", 
-    "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"
+    "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle", "artTitle"
 ];
 
 function getLibrary() { const lib = localStorage.getItem(STORAGE_KEY); return lib ? JSON.parse(lib) : {}; }
@@ -561,7 +568,7 @@ function calc() {
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
-        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"].includes(id);
+        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle", "artTitle"].includes(id);
         if (isText) v[id] = el.value;
         else v[id] = parseFloat(el.value) || 0;
     });
@@ -862,7 +869,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const v = {};
     inputIds.forEach(id => {
         const el = document.getElementById(id);
-        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle"].includes(id);
+        const isText = ["jobNotes", "jobAbout", "jobUrl", "artArtist", "artYear", "artMedium", "mountStyle", "artTitle"].includes(id);
         if (isText) v[id] = el.value;
         else v[id] = parseFloat(el.value) || 0;
     });
@@ -887,7 +894,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const notes = document.getElementById("jobNotes").value;
     const about = document.getElementById("jobAbout").value;
     const job = document.getElementById("jobName").value || "Unnamed Job";
-    
+    const title = document.getElementById("artTitle").value;
     const artist = document.getElementById("artArtist").value;
     const year = document.getElementById("artYear").value;
     const medium = document.getElementById("artMedium").value;
@@ -896,13 +903,18 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     //const sentenceCaseOpeningLabel = openingLabel.charAt(0).toUpperCase() + openingLabel.slice(1).toLowerCase();
 
     let artworkLine = "";
-    if (artist || year || medium || url) {
-        artworkLine = `ARTWORK: ${artist || 'Unknown'} (${year || 'N/A'}) - ${medium || 'N/A'}${url ? '\nURL: ' + url : ''}\n`;
+    if (artist || title || year || medium || url) {
+        artworkLine = `ARTWORK: ${artist || 'Unknown'}, TITLE: ${title || ''} YEAR: ${year || 'N/A'} MEDIUM: ${medium || 'N/A'}${url ? '\nURL: ' + url : ''}\n`;
     }
 
     const text = `--- FRAME JOB: ${job.toUpperCase()} ---
 Generated: ${timestamp}
-${about ? 'ABOUT: ' + about + '\n' : ''}${artworkLine}
+${artist ? 'ARTIST: ' + artist + '\n' : ''}\
+${title ? 'TITLE: ' + title + '\n' : ''}\
+${year ? 'YEAR: ' + year + '\n' : ''}\
+${medium ? 'MEDIUM: ' + medium + '\n' : ''}\
+${url ? 'URL: ' + url + '\n' : ''}\
+${about ? 'ABOUT: ' + about + '\n' : ''}
 PRODUCTION CUTS:
 • Timber: 2 @ ${document.getElementById("outFrmW").innerText}, 2 @ ${document.getElementById("outFrmH").innerText}
 • Glass/Mat: ${document.getElementById("glassResult").innerText}
